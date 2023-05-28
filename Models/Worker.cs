@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using CompanyManager.Models.DTO.WorkerDTO;
+using CompanyManager.Models.DTO;
 using System.Linq;
 
 namespace CompanyManager.Models
@@ -14,7 +14,7 @@ namespace CompanyManager.Models
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         public string Name { get; set; }
@@ -36,7 +36,7 @@ namespace CompanyManager.Models
         public virtual ICollection<Qualification> Qualifications { get; set; } = new HashSet<Qualification>();
 
         [ForeignKey("Company")]
-        public int CompanyId { get; set; }
+        public long CompanyId { get; set; }
         public virtual Company Company { get; set; }
 
         protected Worker() { }
@@ -48,6 +48,12 @@ namespace CompanyManager.Models
             Qualifications = qualifications;
             Salary = salary;
         }
+
+        public IEnumerable<Qualification> GetQualifications()
+        {
+            return Qualifications;
+        }
+
 
         private void CheckArgValidity(string name, ICollection<Qualification> qualifications, double salary)
         {
@@ -73,17 +79,22 @@ namespace CompanyManager.Models
             {
                 var project = wp.Project;
                 if (project.Status == ProjectStatus.FINISHED) continue;
-                workload += project.Size.Value;
+                workload += (int)project.Size; // Access the numeric value of the enum member
             }
 
             return workload;
+        }
+
+        public Qualification GetQualification(string name)
+        {
+            return Qualifications.FirstOrDefault(qual => qual.Name == name);
         }
 
         public bool WillOverload(Project project)
         {
             if (GetProjects().Contains(project)) return false;
 
-            int workloadWithProject = GetWorkload() + project.Size.Value;
+            int workloadWithProject = GetWorkload() + (int)project.Size; // Access the numeric value of the enum member
             return workloadWithProject > MAX_WORKLOAD;
         }
 
