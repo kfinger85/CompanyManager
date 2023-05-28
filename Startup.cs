@@ -6,6 +6,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using CompanyManager.Models;
+using CompanyManager.Contexts;
+
 
 namespace CompanyManager
 {
@@ -50,7 +52,8 @@ namespace CompanyManager
             app.UseAuthorization();
 
                 // Apply pending migrations and create the database
-                dbContext.Database.Migrate();
+                // dbContext.Database.Migrate();
+                dbContext.Database.EnsureCreated();
 
             app.UseEndpoints(endpoints =>
             {
