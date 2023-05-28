@@ -9,9 +9,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/CompanyManager/bin/Debug/net6.0/CompanyManager.dll",
+            "program": "${workspaceFolder}/bin/Debug/net6.0/CompanyManager.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/CompanyManager",
+            "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "serverReadyAction": {
                 "action": "openExternally",
