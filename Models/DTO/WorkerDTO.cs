@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace Edu.Colostate.Cs415.Dto
+namespace CompanyManager.Models.DTO
 {
     public class WorkerDTO
     {
