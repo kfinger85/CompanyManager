@@ -1,12 +1,6 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using CompanyManager.Models;
-using CompanyManager.Contexts;
+
 
 
 namespace CompanyManager
@@ -23,10 +17,14 @@ namespace CompanyManager
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            string connectionStringKey = isWindows ? "DefaultConnection" : "LinuxConnection";
+
             services.AddControllersWithViews();
             
             services.AddDbContext<CompanyManagerContext>(options => options
-                .UseMySql(Configuration.GetConnectionString("DefaultConnection"), new MySqlServerVersion(new Version(8, 0, 26)))
+                .UseMySql(Configuration.GetConnectionString(connectionStringKey), new MySqlServerVersion(new Version(8, 0, 26)))
             );
         }
 
