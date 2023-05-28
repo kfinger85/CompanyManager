@@ -7,7 +7,7 @@ namespace CompanyManager.Models
 {
     public class Company
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         public string Name { get; set; }
 
@@ -79,7 +79,7 @@ namespace CompanyManager.Models
             try
             {
                 newWorker = new Worker(name, qualifications, salary);
-                if (!Qualifications.ContainsAll(qualifications))
+                if (!qualifications.All(q => Qualifications.Contains(q)))
                 {
                     return null;
                 }
@@ -122,25 +122,21 @@ namespace CompanyManager.Models
             return newWorker;
         }
 
-        public Qualification CreateQualification(string description)
+    public Qualification CreateQualification(string description)
+    {
+        Qualification newQualification;
+        try
         {
-            Qualification newQualification;
-            try
-            {
-                newQualification = new Qualification(description);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-
-            if (Qualifications.Add(newQualification))
-            {
-                return newQualification;
-            }
-
+            newQualification = new Qualification(description);
+        }
+        catch (Exception)
+        {
             return null;
         }
+
+        Qualifications.Add(newQualification);
+        return newQualification;
+    }
 
         public Project CreateProject(string name, ICollection<Qualification> qualifications, ProjectSize size)
         {
@@ -184,7 +180,7 @@ namespace CompanyManager.Models
                 throw new ArgumentException("Project is not associated with this company");
             }
 
-            if (project.MissingQualifications.Count > 0)
+            if (project.missingQualifications.Count > 0)
             {
                 throw new ArgumentException("Project has missing qualifications and cannot be started");
             }
@@ -288,7 +284,7 @@ namespace CompanyManager.Models
                 throw new ArgumentException("Worker is not assigned to the project");
             }
 
-            if (worker.GetProjects().Count == 0)
+             if (!worker.GetProjects().Any()) // Updated line
             {
                 AssignedWorkers.Remove(worker);
             }
@@ -298,7 +294,7 @@ namespace CompanyManager.Models
                 AvailableWorkers.Add(worker);
             }
 
-            if (project.Status == ProjectStatus.ACTIVE && project.MissingQualifications.Count > 0)
+            if (project.Status == ProjectStatus.ACTIVE && project.missingQualifications.Count > 0)
             {
                 project.Status = ProjectStatus.SUSPENDED;
             }
