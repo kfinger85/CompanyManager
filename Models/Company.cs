@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.ComponentModel.DataAnnotations.Schema;
+using CompanyManager.Contexts;
 
 namespace CompanyManager.Models
 {
@@ -22,6 +23,7 @@ namespace CompanyManager.Models
         public virtual ICollection<Project> Projects { get; set; } = new HashSet<Project>();
 
         public virtual ICollection<Qualification> Qualifications { get; set; } = new HashSet<Qualification>();
+
 
         public Company()
         {
@@ -74,51 +76,55 @@ namespace CompanyManager.Models
 
         public Worker CreateWorker(string name, ICollection<Qualification> qualifications, double salary)
         {
-            Worker newWorker;
-            try
+            using (var context = new CompanyManagerContext())
             {
-                newWorker = new Worker(name, qualifications, salary);
-                if (!qualifications.All(q => Qualifications.Contains(q)))
+                Worker newWorker;
+                try
+                {
+                    newWorker = new Worker(name, qualifications, salary);
+                    if (!qualifications.All(q => Qualifications.Contains(q)))
+                    {
+                        return null;
+                    }
+                }
+                catch (Exception)
                 {
                     return null;
                 }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
 
-            Workers.Add(newWorker);
-            AvailableWorkers.Add(newWorker);
+                Workers.Add(newWorker);
+                AvailableWorkers.Add(newWorker);
 
-            ICollection<Qualification> toRemove = new List<Qualification>();
-            ICollection<Qualification> toAdd = new List<Qualification>();
+                ICollection<Qualification> toRemove = new List<Qualification>();
+                ICollection<Qualification> toAdd = new List<Qualification>();
 
-            foreach (Qualification companyQual in Qualifications)
-            {
-                foreach (Qualification workerQual in qualifications)
+                foreach (Qualification companyQual in Qualifications)
                 {
-                    if (workerQual.Equals(companyQual))
+                    foreach (Qualification workerQual in qualifications)
                     {
-                        toRemove.Add(companyQual);
-                        Qualification newQual = companyQual;
-                        newQual.AddWorker(newWorker);
-                        toAdd.Add(newQual);
+                        if (workerQual.Equals(companyQual))
+                        {
+                            toRemove.Add(companyQual);
+                            Qualification newQual = companyQual;
+                            newQual.AddWorker(newWorker);
+                            toAdd.Add(newQual);
+                        }
                     }
                 }
-            }
 
-            foreach (Qualification qualification in toRemove)
-            {
-                Qualifications.Remove(qualification);
-            }
+                foreach (Qualification qualification in toRemove)
+                {
+                    Qualifications.Remove(qualification);
+                }
 
-            foreach (Qualification qualification in toAdd)
-            {
-                Qualifications.Add(qualification);
-            }
+                foreach (Qualification qualification in toAdd)
+                {
+                    Qualifications.Add(qualification);
+                }
+                context.SaveChanges(); 
 
-            return newWorker;
+                return newWorker;
+            }
         }
 
     public Qualification CreateQualification(string description)
