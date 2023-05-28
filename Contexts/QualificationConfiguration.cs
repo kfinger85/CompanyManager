@@ -26,12 +26,6 @@ namespace CompanyManager.Contexts
                     j.ToTable("worker_qualification");
                 });
 
-            builder.HasMany(q => q.Companies)
-                .WithMany(c => c.Qualifications)
-                .UsingEntity(j =>
-                {
-                    j.ToTable("company_qualification");
-                });
         }
     }
 }
