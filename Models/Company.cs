@@ -25,7 +25,6 @@ namespace CompanyManager.Models
 
         public Company()
         {
-            // Default constructor required by Entity Framework
         }
 
         public Company(string name)
