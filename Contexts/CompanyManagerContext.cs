@@ -64,16 +64,13 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
         .HasKey(wq => new { wq.WorkerId, wq.QualificationId });
 
     modelBuilder.Entity<WorkerQualification>()
-        .ToTable("WorkerQualification"); // Specify the table name explicitly
-
-    modelBuilder.Entity<WorkerQualification>()
         .HasOne(wq => wq.Worker)
-        .WithMany()
+        .WithMany(w => w.WorkerQualifications)
         .HasForeignKey(wq => wq.WorkerId);
 
     modelBuilder.Entity<WorkerQualification>()
         .HasOne(wq => wq.Qualification)
-        .WithMany()
+        .WithMany(q => q.WorkerQualifications)
         .HasForeignKey(wq => wq.QualificationId);
 
     // Configure WorkerProject entity
