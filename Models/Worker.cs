@@ -35,7 +35,7 @@ namespace CompanyManager.Models
 
         public virtual ICollection<Qualification> Qualifications { get; set; } = new HashSet<Qualification>();
 
-        public ICollection<WorkerQualification> WorkerQualifications { get; set; }
+        // public ICollection<WorkerQualification> WorkerQualifications { get; set; }
 
         
         public long CompanyId { get; set; }
