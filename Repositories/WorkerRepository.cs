@@ -13,10 +13,11 @@ namespace CompanyManager.Repositories{
             _context = context;
         }
 
-        public Worker GetById(int id)
+        public Worker GetById(long id)
         {
             return _context.Workers.FirstOrDefault(w => w.Id == id);
         }
+
 
         public IEnumerable<Worker> GetAll()
         {
