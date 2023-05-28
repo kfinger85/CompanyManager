@@ -28,8 +28,12 @@ public class CompanyManagerContext : DbContext
 
         modelBuilder.Entity<Company>()
             .HasMany(c => c.Qualifications)
-            .WithMany(q => q.Companies);
-
+            .WithMany(q => q.Companies)
+            .UsingEntity<CompanyQualification>(
+                cq => cq.HasOne(c => c.Qualification).WithMany(),
+                cq => cq.HasOne(c => c.Company).WithMany()
+            );
+            
         modelBuilder.Entity<Company>()
             .HasMany(c => c.Projects)
             .WithOne(p => p.Company) // Add the navigation property here
@@ -57,7 +61,15 @@ public class CompanyManagerContext : DbContext
             // .HasForeignKey(p => p.CompanyId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<WorkerQualification>().HasKey(wq => new { wq.WorkerId, wq.QualificationId });
+            // Configure Qualification
+        modelBuilder.Entity<Qualification>()
+        .HasMany(q => q.Companies)
+        .WithMany(c => c.Qualifications); 
 
+        // modelBuilder.Entity<WorkerQualification>().HasKey(wq => new { wq.WorkerId, wq.QualificationId });
+        modelBuilder.Entity<WorkerQualification>()
+                .HasNoKey();
+        modelBuilder.Entity<CompanyQualification>()
+                .HasNoKey();
     }
 }
