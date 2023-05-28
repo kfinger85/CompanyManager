@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using CompanyManager.Models;
 using Microsoft.EntityFrameworkCore;
+using CompanyManager.Contexts;
 
 namespace CompanyManager.Repositories
 {
