@@ -26,10 +26,12 @@ namespace CompanyManager.Models
         public virtual ICollection<Qualification> Qualifications { get; set; } = new HashSet<Qualification>();
 
         [ForeignKey("Company")]
-        public int CompanyId { get; set; }
+        public long CompanyId { get; set; }
         public virtual Company Company { get; set; }
 
         public virtual ICollection<WorkerProject> WorkerProjects { get; set; }
+
+        public ICollection<Qualification> missingQualifications; 
 
         public Project() { }
 
@@ -167,7 +169,7 @@ namespace CompanyManager.Models
                 throw new ArgumentException("Null Qualification");
             }
             Qualifications.Add(qualification);
-            if (Status == ProjectStatus.ACTIVE && !GetMissingQualifications().IsEmpty())
+            if (Status == ProjectStatus.ACTIVE && GetMissingQualifications().Count > 0) // Updated line
             {
                 Status = ProjectStatus.SUSPENDED;
             }
@@ -181,7 +183,7 @@ namespace CompanyManager.Models
                 bool missing = true;
                 foreach (var worker in Workers)
                 {
-                    if (worker.GetQualifications().Contains(qualification))
+                    if (worker.Qualifications.Any(q => q.Name == qualification.Name)) // Updated line
                     {
                         missing = false;
                         break;
@@ -194,6 +196,7 @@ namespace CompanyManager.Models
             }
             return missingQualifications;
         }
+
 
         public bool IsHelpful(Worker worker)
         {
