@@ -28,6 +28,7 @@ namespace CompanyManager.Models
         public long CompanyId { get; set; }
         public virtual Company Company { get; set; }
 
+        // This exists to make EF happy
         public virtual ICollection<WorkerProject> WorkerProjects { get; set; }
 
         public ICollection<Qualification> missingQualifications; 
