@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CompanyManager.Models;
-using CompanyManager.Contexts;
 
 
 namespace CompanyManager.Repositories
@@ -19,6 +18,11 @@ namespace CompanyManager.Repositories
         public Project GetById(long id)
         {
             return _context.Projects.FirstOrDefault(p => p.Id == id);
+        }
+
+        public Project GetByName(string name)
+        {
+            return _context.Projects.FirstOrDefault(p => p.Name == name);
         }
 
         public IEnumerable<Project> GetAll()

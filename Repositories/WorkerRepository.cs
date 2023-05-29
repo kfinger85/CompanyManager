@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CompanyManager.Models;
-using CompanyManager.Contexts;
 namespace CompanyManager.Repositories{
     public class WorkerRepository : IWorkerRepository
     {

@@ -2,11 +2,10 @@ using System;
 using System.Linq;
 using CompanyManager.Models;
 using Microsoft.EntityFrameworkCore;
-using CompanyManager.Contexts;
 
 namespace CompanyManager.Repositories
 {
-    public class CompanyRepository
+    public class CompanyRepository : ICompanyRepository
     {
         private readonly CompanyManagerContext _context;
 
