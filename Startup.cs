@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
+using CompanyManager.Repositories;
 
 
 
@@ -26,6 +27,10 @@ namespace CompanyManager
             services.AddDbContext<CompanyManagerContext>(options => options
                 .UseMySql(Configuration.GetConnectionString(connectionStringKey), new MySqlServerVersion(new Version(8, 0, 26)))
             );
+            services.AddScoped<IQualificationRepository, QualificationRepository>();
+            services.AddScoped<ICompanyRepository, CompanyRepository>();
+            services.AddScoped<IWorkerRepository, WorkerRepository>();
+            services.AddScoped<IProjectRepository, ProjectRepository>();            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
