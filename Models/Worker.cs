@@ -38,7 +38,7 @@ namespace CompanyManager.Models
         public long CompanyId { get; set; }
         public virtual Company Company { get; set; }
 
-        protected Worker() { }
+        public Worker() { }
 
         public Worker(string name, ICollection<Qualification> qualifications, double salary)
         {
