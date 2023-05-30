@@ -43,7 +43,8 @@ namespace CompanyManager.Services
         }
         public void UnassignWorkerFromProject(int workerId, int projectId)
         {
-            try{
+            try
+            {
                 // Fetch the worker and the project from the database
                 Worker worker = _workerRepository.GetById(workerId);
                 Project project = _projectRepository.GetById(projectId);
@@ -70,11 +71,11 @@ namespace CompanyManager.Services
             _projectRepository.Update(project);
             _projectRepository.SaveChanges();
         }
-        public void startProject(String project)
+        public void startProject(String projectName)
         {
-            Project project1 = _projectRepository.GetByName(project);
-            project1.SetStatus(ProjectStatus.ACTIVE);
-            _projectRepository.Update(project1);
+            Project project = _projectRepository.GetByName(projectName);
+            project.SetStatus(ProjectStatus.ACTIVE);
+            _projectRepository.Update(project);
             _projectRepository.SaveChanges();
         }
 
@@ -91,6 +92,23 @@ namespace CompanyManager.Services
             _projectRepository.Update(project);
             _projectRepository.SaveChanges();
         }
+        public void createWorker(Worker worker){
+            _workerRepository.Add(worker);
+            _workerRepository.SaveChanges();
+        }
+        public void createProject(Project project){
+            _projectRepository.Add(project);
+            _projectRepository.SaveChanges();
+        }
+        public void createCompany(Company company){
+            _companyRepository.Add(company);
+            _companyRepository.SaveChanges();
+        }
+        public void createQualification(Qualification qualification){
+            _qualificationRepository.Add(qualification);
+            _qualificationRepository.SaveChanges();
+        }
+        
     }
 
 }
