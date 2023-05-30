@@ -8,9 +8,11 @@ public class CompanyManagerContext : DbContext
     public DbSet<Qualification> Qualifications { get; set; }
     public DbSet<Worker> Workers { get; set; }
 
+
+
     public CompanyManagerContext(DbContextOptions<CompanyManagerContext> options) : base(options)
     {
-        this.Database.EnsureDeleted();  // drop the database if it exists
+
         this.Database.EnsureCreated();  // create the database
     }
 
