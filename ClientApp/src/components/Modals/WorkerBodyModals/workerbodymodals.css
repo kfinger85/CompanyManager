@@ -1,0 +1,9 @@
+.project-name {
+    cursor: pointer;
+  }
+  
+  .project-name:hover {
+    opacity: 0.5;
+  }
+  
+ 

@@ -1,0 +1,23 @@
+/* AssignWorkerModal.css */
+
+.modal-body {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .worker-item {
+    cursor: pointer;
+    background-color: transparent;
+  }
+  
+  .worker-item:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .worker-item.unavailable {
+    cursor: not-allowed;
+    background-color: #f0f0f0;
+    opacity: 0.5;
+  }
+
+
