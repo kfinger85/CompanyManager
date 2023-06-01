@@ -3,7 +3,7 @@ using CompanyManager.Models;
 
 namespace CompanyManager.Services
 {
-    public interface ICompanyService
+    public interface ICompanyManagerService
     {
         Worker CreateWorker(string companyName, string name, HashSet<Qualification> qualifications, double salary);
 

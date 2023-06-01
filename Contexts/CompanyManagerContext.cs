@@ -8,9 +8,11 @@ public class CompanyManagerContext : DbContext
     public DbSet<Qualification> Qualifications { get; set; }
     public DbSet<Worker> Workers { get; set; }
 
+
+
     public CompanyManagerContext(DbContextOptions<CompanyManagerContext> options) : base(options)
     {
-        this.Database.EnsureDeleted();  // drop the database if it exists
+
         this.Database.EnsureCreated();  // create the database
     }
 
@@ -20,44 +22,64 @@ public class CompanyManagerContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configure Company
+        // A Company has many Workers. Each Worker is associated with one Company. 
+        // When a Company is deleted, all associated Workers will be deleted.
         modelBuilder.Entity<Company>()
             .HasMany(c => c.Workers)
-            .WithOne(w => w.Company) // Add the navigation property here
-            .OnDelete(DeleteBehavior.Cascade);
+            .WithOne(w => w.Company); 
 
+        // A Company has many Qualifications and a Qualification can be associated with many Companies. 
+        // The relationship is managed through a joining table "CompanyQualification".
         modelBuilder.Entity<Company>()
             .HasMany(c => c.Qualifications)
-            .WithMany(q => q.Companies);
-
+            .WithMany(q => q.Companies)
+            .UsingEntity(j => j.ToTable("CompanyQualification"));
+            
+        // A Company has many Projects. Each Project is associated with one Company.
         modelBuilder.Entity<Company>()
             .HasMany(c => c.Projects)
-            .WithOne(p => p.Company) // Add the navigation property here
-            .OnDelete(DeleteBehavior.Cascade);
+            .WithOne(p => p.Company);
 
+        // A Worker can work on many Projects and a Project can have many Workers working on it.
+        // The relationship is managed through a joining table "WorkerProject".
+            modelBuilder.Entity<WorkerProject>()
+                .HasKey(wp => new { wp.WorkerId, wp.ProjectId });
 
-        // Configure Worker
-        modelBuilder.Entity<Worker>()
-            .HasMany(w => w.Projects)
-            .WithMany(p => p.Workers);
+            modelBuilder.Entity<WorkerProject>()
+                .HasOne(wp => wp.Worker)
+                .WithMany(w => w.WorkerProjects)
+                .HasForeignKey(wp => wp.WorkerId);
 
+            modelBuilder.Entity<WorkerProject>()
+                .HasOne(wp => wp.Project)
+                .WithMany(p => p.WorkerProjects)
+                .HasForeignKey(wp => wp.ProjectId);
+        // A Worker can have many Qualifications and a Qualification can be possessed by many Workers.
+        // The relationship is managed through a joining table "WorkerQualification".
         modelBuilder.Entity<Worker>()
             .HasMany(w => w.Qualifications)
-            .WithMany(q => q.Workers);
+            .WithMany(q => q.Workers)
+            .UsingEntity(j => j.ToTable("WorkerQualification"));
 
+        // A Worker is associated with one Company and a Company can have many Workers.
+        // When a Worker is deleted, it is also removed from the list of Workers of its associated Company.
         modelBuilder.Entity<Worker>()
-              .HasOne(w => w.Company) // declares a relationship to Company
-              .WithMany(c => c.Workers) // declares that Company has many Workers
-              // .HasForeignKey(w => w.CompanyId) // explicitly sets the foreign key to CompanyId
-              .OnDelete(DeleteBehavior.Cascade); // or whatever delete behavior you want
+            .HasOne(w => w.Company)
+            .WithMany(c => c.Workers) 
+            .OnDelete(DeleteBehavior.Cascade);
 
+        // A Project is associated with one Company and a Company can have many Projects.
+        // When a Project is deleted, it is also removed from the list of Projects of its associated Company.
         modelBuilder.Entity<Project>()
             .HasOne(p => p.Company)
             .WithMany(c => c.Projects)
-            // .HasForeignKey(p => p.CompanyId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<WorkerQualification>().HasKey(wq => new { wq.WorkerId, wq.QualificationId });
-
-    }
+        // A Qualification can be associated with many Companies and a Company can require many Qualifications.
+        // The relationship is managed through a joining table "CompanyQualification".
+        modelBuilder.Entity<Qualification>()
+            .HasMany(q => q.Companies)
+            .WithMany(c => c.Qualifications)
+            .UsingEntity(j => j.ToTable("CompanyQualification"));
+            }
 }

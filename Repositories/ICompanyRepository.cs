@@ -1,11 +1,14 @@
-using System;
 using CompanyManager.Models;
 
 namespace CompanyManager.Repositories
 {
     public interface ICompanyRepository
     {
-        Company FindByName(string name);
-        void Save(Company company);
+        Company GetById(int id);
+        IEnumerable<Company> GetAll();
+        void Add(Company company);
+        void Update(Company company);
+        void Delete(Company company);
+        void SaveChanges();
     }
 }

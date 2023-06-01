@@ -1,0 +1,189 @@
+.gray-container-worker-qual div {
+  background-color: white !important;
+  padding: 4px;
+}
+
+.gray-container-worker-qual div:hover {
+  background-color: rgb(125, 159, 129) !important;
+}
+
+.gray-container-worker-project div {
+  background-color: white !important;
+  padding: 4px;
+}
+
+.gray-container-worker-project div:hover {
+  background-color: rgb(180, 194, 221) !important;
+}
+
+.gray {
+  background-color: gray !important;
+}
+/* .worker-padding {
+  padding-right: 10px;
+} */
+
+  .worker-input-fields{
+    display: flex;
+    justify-content: space-around;
+    padding-bottom: 10px;
+  }
+  
+
+.worker-input-name {
+  width: 100% !important;
+  background-color: #f8f8f8 !important;
+  margin-right: 5px;
+  /* font-size: 16px;
+  padding: 0.2vw; */
+}
+
+.worker-input-salary {
+  width: 100% !important;
+  background-color: #f8f8f8 !important;
+  margin-left: 5px;
+  /* font-size: 16px;
+  padding: 0.2vw; */
+}
+
+.worker-modal-qualification-input {
+  /* width: 40%; */
+  background-color: #f8f8f8 !important;
+  /* font-size: 16px;
+  padding: 0.2vw;
+  display: inline-block; */
+}
+
+.worker-qualification-box {
+  width: 100%;
+  background-color: rgb(159, 157, 157) !important;
+  overflow-y: auto !important;
+  padding: 0.1vw !important;
+  max-height: 150px;
+  border-radius: 5px;
+}
+
+.worker-button {
+  /* background: linear-gradient(10deg, #121010 40%, rgba(0, 0, 0, 0) 30%),
+    radial-gradient(farthest-corner at 0% 0%, #3d3d45 70%, #0e68d7 70%) !important; */
+  color: black;
+}
+
+.worker-button:hover {
+  background-color: rgb(30, 69, 198) !important;
+  color: white !important;
+  cursor: pointer;
+}
+
+.worker-button-invalid {
+  width: 100%;
+  background-color: white !important;
+  color: gray !important;
+}
+
+.worker-button-valid {
+  width: 100%;
+  background-color: #658864 !important;
+  color: white !important;
+  border-top: #d0c6b4 !important;
+  border-left: rgb(83, 117, 87) !important;
+  border-right: rgb(178, 151, 155) !important;
+  /* padding-top: 5px;
+  padding-bottom: 5px; */
+}
+
+.worker-button-valid:hover {
+  width: 100%;
+  background-color: #658864;
+  color: black !important;
+  border: solid rgb(69, 66, 66) !important;
+  /* padding-top: 5px;
+  padding-bottom: 5px;
+  cursor: pointer; */
+}
+
+.worker-input-all {
+  /* margin-left: 3px; */
+  border: none;
+}
+
+.no-check-box {
+  display: none;
+}
+
+.no-check-input {
+  padding: 5px;
+}
+
+/* qualification css in WorkerModal */
+
+.worker-modal-qualification-input {
+  background-color: rgb(230, 230, 230) !important;
+  color: black !important;
+  /* font-size: 16px; */
+  /* padding: 0.1vw !important; */
+  border: none !important;
+}
+
+.worker-modal-qualification-input:hover {
+  width: 40% !important;
+  background-color: white !important;
+  color: black !important;
+  /* font-size: 16px;
+  padding: 0.1vw; */
+}
+
+.qualification-button-invalid {
+  /* width: 100%; */
+  background-color: transparent !important;
+  color: transparent !important;
+  border: none !important;
+  display: none !important;
+}
+
+.qualification-button-valid {
+  background-color: #6a909f !important;
+  color: white !important;
+  border-top: 1px #d0c6b4 !important;
+  border-left: 1px rgb(83, 117, 87) !important;
+  border-right: 1px rgb(178, 151, 155) !important;
+}
+
+.qualification-button-valid:hover {
+  /* width: 100%; */
+  background-color: #6a909f !important;
+  color: black !important;
+  border: solid rgb(69, 66, 66) 4px !important;
+}
+
+.qualification-header-check-box {
+  /* padding: 0.1vw;
+  padding: 4px; */
+  color: black !important;
+}
+
+.worker-modal-header {
+  background-color: #0e68d7 !important;
+  color: white;
+}
+/* qualification css in WorkerModal */
+
+.worker-modal-body {
+  background-color: black !important;
+  color: white;
+}
+
+.workers-no-projects-message {
+  color: rgb(251, 94, 94) !important;
+  background-color: white;
+  margin: 0.2vw !important;
+  padding: 0.2vw !important;
+}
+
+.worker-qualifications {
+  color: rgb(83, 117, 87) !important;
+}
+
+.red {
+  color: red;
+}

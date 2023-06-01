@@ -22,7 +22,7 @@ namespace CompanyManager.Models
         public virtual ICollection<Worker> Workers {get; set; }= new HashSet<Worker>();
         public virtual ICollection<Company> Companies { get; set; } = new HashSet<Company>();
 
-        public virtual ICollection<WorkerQualification> WorkerQualifications { get; set; } = new HashSet<WorkerQualification>();
+        // public virtual ICollection<WorkerQualification> WorkerQualifications { get; set; } = new HashSet<WorkerQualification>();
 
         protected Qualification() 
         { 
@@ -35,8 +35,6 @@ namespace CompanyManager.Models
                 throw new ArgumentException("Description must not be null or empty");
             }
             Workers = new HashSet<Worker>();
-            Companies = new List<Company>();
-
             Name = description;
         }
 

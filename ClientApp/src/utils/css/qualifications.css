@@ -1,0 +1,47 @@
+.gray-container-worker-qual div {
+  background-color: white !important;
+}
+
+.gray-container-worker-qual div:hover {
+  background-color: gray !important;
+}
+
+.qualification-button {
+  background: linear-gradient(10deg, #121010 40%, rgba(0, 0, 0, 0) 30%),
+    radial-gradient(farthest-corner at 0% 0%, #3d3d45 70%, #ccd352 70%) !important;
+  color: white;
+}
+
+.qualification-button:hover {
+  background-color: gray !important;
+  color: white !important;
+  cursor: pointer;
+}
+
+.qualification-no-workers-message {
+  color: rgb(251, 94, 94) !important;
+  background-color: white;
+  margin: 0.2vw !important;
+  padding: 0.2vw !important;
+  /* text-align: center; */
+}
+
+.white-container-no-worker-qual div {
+  background-color: white !important;
+}
+
+.go-to-worker-button {
+  background-color: white !important;
+  color: rgb(30, 69, 198) !important;
+  width: 100% !important;
+  padding: 0.2vw !important;
+}
+
+.go-to-worker-button:hover {
+  background-color: rgb(30, 69, 198) !important;
+  color: white !important;
+}
+
+.gray {
+  background-color: gray;
+}

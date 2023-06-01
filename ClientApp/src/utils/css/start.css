@@ -1,0 +1,42 @@
+.red-text {
+  color: white;
+  size: 14px !important;
+  background-color: red;
+  padding: 10px;
+}
+
+.start-header {
+  background-color: darkslategray;
+  color: white;
+}
+
+.start-button {
+  color: darkslategray !important;
+  float: right !important;
+}
+
+.start-button:hover {
+  background-color: darkslategray !important;
+  color: white !important;
+}
+
+.start-header {
+  display: flex;
+}
+
+.stop-button {
+  color: darkslategray !important;
+  float: right;
+}
+
+.stop-button:hover {
+  background-color: darkslategray !important;
+  color: white !important;
+}
+
+.icon-button-container {
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}

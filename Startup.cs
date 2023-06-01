@@ -1,13 +1,8 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using CompanyManager.Models;
-using CompanyManager.Contexts;
-
+using CompanyManager.Repositories;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 
 namespace CompanyManager
 {
@@ -23,52 +18,64 @@ namespace CompanyManager
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // services.AddControllersWithViews();
-            services.AddControllers(); //  will register only MVC controllers in the DI container, not the views
+
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            string connectionStringKey = isWindows ? "DefaultConnection" : "LinuxConnection";
+
+            services.AddControllersWithViews();
 
             services.AddDbContext<CompanyManagerContext>(options => options
-                .UseMySql(Configuration.GetConnectionString("DefaultConnection"), new MySqlServerVersion(new Version(8, 0, 26)))
+                .UseMySql(Configuration.GetConnectionString(connectionStringKey),
+                    new MySqlServerVersion(new Version(8, 0, 26)))
             );
+            services.AddScoped<IQualificationRepository, QualificationRepository>();
+            services.AddScoped<ICompanyRepository, CompanyRepository>();
+            services.AddScoped<IWorkerRepository, WorkerRepository>();
+            services.AddScoped<IProjectRepository, ProjectRepository>();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowReactApp",
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:3000") // React app's url
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, CompanyManagerContext dbContext)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
 
-            // app.UseHttpsRedirection();
-            app.UseHsts(); // don't need HTTPS
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
             app.UseAuthorization();
 
-                // Apply pending migrations and create the database
-                // dbContext.Database.Migrate();
-                dbContext.Database.EnsureCreated();
+            // Apply pending migrations and create the database
+            // dbContext.Database.Migrate();
+            dbContext.Database.EnsureCreated();
+
+            app.UseStaticFiles(); // For the wwwroot folder
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), "ClientApp/build")),
+                RequestPath = "" // empty RequestPath means serve from the root
+            });
+
+            app.UseCors("AllowReactApp");
 
             app.UseEndpoints(endpoints =>
             {
-                /*
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-                    */
-                    endpoints.MapControllers(); // map only controllers, no view
+                endpoints.MapControllers();
             });
-                
-
-
-            }
+        }
     }
 }

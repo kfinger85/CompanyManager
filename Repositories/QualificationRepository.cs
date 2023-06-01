@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CompanyManager.Models;
-using CompanyManager.Contexts;
 
 namespace CompanyManager.Repositories{
     public class QualificationRepository : IQualificationRepository
@@ -18,6 +17,11 @@ namespace CompanyManager.Repositories{
         public Qualification GetById(long id)
         {
             return _context.Qualifications.FirstOrDefault(q => q.Id == id);
+        }
+
+        public Qualification GetByName(string name)
+        {
+            return _context.Qualifications.FirstOrDefault(q => q.Name == name);
         }
 
         public IEnumerable<Qualification> GetAll()

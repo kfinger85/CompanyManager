@@ -1,0 +1,450 @@
+.gray-container-worker-qual div {
+
+  background-color: white !important;
+
+  padding: 4px;
+
+}
+
+
+
+
+.gray-container-worker-qual div:hover {
+
+  background-color: rgb(125, 159, 129) !important;
+
+}
+
+
+
+
+.gray-container-worker-project div {
+
+  background-color: white !important;
+
+  padding: 4px;
+
+}
+
+
+
+
+.gray-container-worker-project div:hover {
+
+  background-color: rgb(180, 194, 221) !important;
+
+}
+
+
+
+
+.gray {
+
+  background-color: gray !important;
+
+}
+
+/* .worker-padding {
+
+  padding-right: 10px;
+
+} */
+
+
+
+
+.project-input-name {
+
+  /*width: 70% !important;*/
+
+  background-color: #f8f8f8 !important;
+
+  margin-bottom: 10px;
+
+  /* font-size: 16px;
+
+  padding: 0.2vw; */
+
+}
+
+
+
+
+.project-input-salary {
+
+  width: 100% !important;
+
+  background-color: #f8f8f8 !important;
+
+  margin-left: 2;
+
+  /* font-size: 16px;
+
+  padding: 0.2vw; */
+
+}
+
+
+
+
+.project-modal-qualification-input {
+
+  /* width: 40%; */
+
+  background-color: #f8f8f8 !important;
+
+  /* font-size: 16px;
+
+  padding: 0.2vw;
+
+  display: inline-block; */
+
+}
+
+
+
+
+.project-qualification-box {
+
+  width: 100%;
+
+  background-color: rgb(126, 126, 126) !important;
+
+  overflow-y: auto !important;
+
+  padding: 0.1vw !important;
+
+  max-height: 150px;
+
+  border-radius: 5px;
+
+}
+
+
+
+
+.project-button {
+
+  /* background: linear-gradient(10deg, #121010 40%, rgba(0, 0, 0, 0) 30%),
+
+   radial-gradient(farthest-corner at 0% 0%, #3d3d45 70%, #0e68d7 70%) !important; */
+
+ color: black;
+
+}
+
+
+
+
+.project-button:hover {
+
+  background-color: rgb(103, 187, 100) !important;
+
+  color: white !important;
+
+  cursor: pointer;
+
+}
+
+
+
+
+.project-button-invalid {
+
+  width: 100%;
+
+  background-color: white !important;
+
+  color: gray !important;
+
+}
+
+
+
+
+.project-button-valid {
+
+  width: 100%;
+
+  background-color: #658864 !important;
+
+  color: white !important;
+
+  border-top: #d0c6b4 !important;
+
+  border-left: rgb(83, 117, 87) !important;
+
+  border-right: rgb(178, 151, 155) !important;
+
+  /* padding-top: 5px;
+
+  padding-bottom: 5px; */
+
+}
+
+
+
+
+.project-button-valid:hover {
+
+  width: 100%;
+
+  background-color: #658864;
+
+  color: black !important;
+
+  border: solid rgb(69, 66, 66) !important;
+
+  /* padding-top: 5px;
+
+  padding-bottom: 5px;
+
+  cursor: pointer; */
+
+}
+
+
+
+
+.project-input-all {
+
+  /* margin-left: 3px; */
+
+  border: none;
+
+}
+
+
+
+
+.no-check-box {
+
+  display: none;
+
+}
+
+
+
+
+.no-check-input {
+
+  padding: 5px;
+
+}
+
+
+
+
+/* qualification css in WorkerModal */
+
+
+
+
+.project-modal-qualification-input {
+
+  background-color: rgb(159, 157, 157) !important;
+
+  color: black !important;
+
+  /* font-size: 16px; */
+
+  /* padding: 0.1vw !important; */
+
+  border: none !important;
+
+}
+
+
+
+
+.project-modal-qualification-input:hover {
+
+  width: 40% !important;
+
+  background-color: white !important;
+
+  color: black !important;
+
+  /* font-size: 16px;
+
+  padding: 0.1vw; */
+
+}
+
+
+
+
+.project-button-invalid {
+
+  /* width: 100%; */
+
+  background-color: transparent !important;
+
+  color: transparent !important;
+
+  border: none !important;
+
+  display: none !important;
+
+}
+
+
+
+
+.project-button-valid {
+
+  background-color: #0981e4 !important;
+
+  color: white !important;
+
+  border-top: 1px #5181a8  !important;
+
+  border-left: 1px #5181a8  !important;
+
+  border-right: 1px #5181a8  !important;
+
+}
+
+
+
+
+.project-button-valid:hover {
+
+  /* width: 100%; */
+
+  background-color: #1f96f8 !important;
+
+  color: white !important;
+
+  border: solid #20659e 4px !important;
+
+}
+
+
+
+
+.project-header-check-box {
+
+  /* padding: 0.1vw;
+
+  padding: 4px; */
+
+color: black !important;
+
+}
+
+
+
+
+.project-modal-header {
+
+  background-color: rgb(115, 190, 96) !important;
+
+  color: white;
+
+}
+
+/* qualification css in WorkerModal */
+
+
+
+
+.project-modal-body {
+
+  background-color: rgb(224, 224, 224) !important;
+
+  color: white;
+
+}
+
+
+
+
+.project-no-projects-message {
+
+  color: rgb(251, 94, 94) !important;
+
+  background-color: white;
+
+  margin: 0.2vw !important;
+
+  padding: 0.2vw !important;
+
+}
+
+
+
+
+.project-qualifications {
+
+  color: rgb(83, 117, 87) !important;
+
+}
+
+
+
+
+.red {
+
+  color: red;
+
+}
+
+
+
+
+.project-buttongroup-container {
+
+ /* display: inline-flex !important;*/
+
+  justify-content: space-around !important;
+
+  margin-bottom: 10px;
+
+  align-items: start !important; 
+
+  /* width: 100%; */
+
+}
+
+
+
+
+/* might not need this */
+
+
+
+
+.project-button-from-qualification-page {
+
+  background-color: white !important;
+
+  color: rgb(30, 69, 198) !important;
+
+  width: 100% !important;
+
+  padding: 0.2vw !important;
+
+}
+
+
+
+
+.project-button-from-qualification-page:hover {
+
+  background-color: rgb(30, 69, 198) !important;
+
+  color: white !important;
+
+}
+
+
+
+
+.drop-title {
+
+  background-color: rgb(170, 170, 170);
+
+  color: rgb(68, 68, 68);
+
+}

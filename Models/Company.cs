@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.ComponentModel.DataAnnotations.Schema;
-using CompanyManager.Contexts;
 
 namespace CompanyManager.Models
 {
@@ -36,11 +35,6 @@ namespace CompanyManager.Models
                 throw new ArgumentException("Name must not be null or empty");
             }
             Name = name;
-            Workers = new HashSet<Worker>();
-            AvailableWorkers = new HashSet<Worker>();
-            AssignedWorkers = new HashSet<Worker>();
-            Projects = new HashSet<Project>();
-            Qualifications = new HashSet<Qualification>();
         }
 
         public static Company GetCompany(string name)
