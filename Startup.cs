@@ -22,8 +22,8 @@ namespace CompanyManager
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             string connectionStringKey = isWindows ? "DefaultConnection" : "LinuxConnection";
 
-            services.AddControllersWithViews();
-
+            // services.AddControllersWithViews();
+            services.AddControllers(); //  Add only the services for the controllers to the DI container, without the view related services
             services.AddDbContext<CompanyManagerContext>(options => options
                 .UseMySql(Configuration.GetConnectionString(connectionStringKey),
                     new MySqlServerVersion(new Version(8, 0, 26)))
@@ -50,8 +50,9 @@ namespace CompanyManager
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, CompanyManagerContext dbContext)
         {
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            // app.UseHttpsRedirection();
+            app.UseHsts(); // don't need HTTPS
+           
 
             app.UseRouting();
 
@@ -61,6 +62,8 @@ namespace CompanyManager
             // dbContext.Database.Migrate();
             dbContext.Database.EnsureCreated();
 
+            //  not serving any static files or views
+            /*
             app.UseStaticFiles(); // For the wwwroot folder
 
             app.UseStaticFiles(new StaticFileOptions
@@ -69,12 +72,17 @@ namespace CompanyManager
                     Path.Combine(Directory.GetCurrentDirectory(), "ClientApp/build")),
                 RequestPath = "" // empty RequestPath means serve from the root
             });
-
+            */
             app.UseCors("AllowReactApp");
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync("Hello World");
+                });
+
+                endpoints.MapControllers(); // Map your REST endpoints here
             });
         }
     }
