@@ -23,8 +23,9 @@ namespace CompanyManager
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
-            
+            // services.AddControllersWithViews();
+            services.AddControllers(); //  will register only MVC controllers in the DI container, not the views
+
             services.AddDbContext<CompanyManagerContext>(options => options
                 .UseMySql(Configuration.GetConnectionString("DefaultConnection"), new MySqlServerVersion(new Version(8, 0, 26)))
             );
@@ -43,8 +44,9 @@ namespace CompanyManager
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            
-            app.UseHttpsRedirection();
+
+            // app.UseHttpsRedirection();
+            app.UseHsts(); // don't need HTTPS
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -57,10 +59,16 @@ namespace CompanyManager
 
             app.UseEndpoints(endpoints =>
             {
+                /*
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                    */
+                    endpoints.MapControllers(); // map only controllers, no view
             });
-        }
+                
+
+
+            }
     }
 }
