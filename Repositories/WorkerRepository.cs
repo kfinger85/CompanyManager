@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CompanyManager.Models;
+using Microsoft.EntityFrameworkCore;
 namespace CompanyManager.Repositories{
     public class WorkerRepository : IWorkerRepository
     {
@@ -10,6 +11,11 @@ namespace CompanyManager.Repositories{
         public WorkerRepository(CompanyManagerContext context)
         {
             _context = context;
+        }
+
+        public Worker GetByName(string name)
+        {
+            return _context.Workers.FirstOrDefault(w => w.Name == name);
         }
 
         public Worker GetById(long id)
@@ -21,6 +27,11 @@ namespace CompanyManager.Repositories{
         public IEnumerable<Worker> GetAll()
         {
             return _context.Workers.ToList();
+        }
+
+        public IEnumerable<Worker> GetAllWithQualifications()
+        {
+            return _context.Workers.Include(w => w.Qualifications);
         }
 
         public void Add(Worker worker)

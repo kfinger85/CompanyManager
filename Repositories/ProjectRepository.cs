@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CompanyManager.Models;
+using Microsoft.EntityFrameworkCore;
+
 
 
 namespace CompanyManager.Repositories
@@ -30,8 +32,24 @@ namespace CompanyManager.Repositories
             return _context.Projects.ToList();
         }
 
+        public IEnumerable<Project> GetAllWithQualifications()
+        {
+            return _context.Projects.Include(p => p.Qualifications);
+        }
+
+
         public void Add(Project project)
         {
+            if (project == null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+            
+            if (project.Qualifications == null)
+            {
+                throw new ArgumentNullException(nameof(project.Qualifications), "The qualifications collection is null.");
+            }
+    
             _context.Projects.Add(project);
         }
 
@@ -49,5 +67,25 @@ namespace CompanyManager.Repositories
         {
             _context.SaveChanges();
         }
+        public void StartProject(string projectName)
+        {
+            Project project = _context.Projects.FirstOrDefault(p => p.Name == projectName);
+            if (project == null)
+            {
+                throw new InvalidOperationException("Project not found.");
+            }
+            _context.Projects.Update(project);
+        }
+        public void FinishProject(string projectName)
+        {
+            Project project = _context.Projects.FirstOrDefault(p => p.Name == projectName);
+            if (project == null)
+            {
+                throw new InvalidOperationException("Project not found.");
+            }
+            _context.Projects.Update(project);
+            _context.SaveChanges();
+        }
+
     }
 }

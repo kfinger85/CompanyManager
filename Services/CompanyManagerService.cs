@@ -7,6 +7,7 @@ namespace CompanyManager.Services
 {
     public class CompanyMangerService
     {
+        /*
         private readonly ICompanyRepository _companyRepository;
         private readonly IWorkerRepository _workerRepository;
         private readonly IProjectRepository _projectRepository;
@@ -30,17 +31,29 @@ namespace CompanyManager.Services
             Worker worker = _workerRepository.GetById(workerId);
             Project project = _projectRepository.GetById(projectId);
 
-            // Call a method on the Worker entity to assign it to the project
-            worker.AddProject(project);
+            // Check if the worker is already assigned to this project
+            var existingWorkerProject = _workerRepository.GetById(workerId);
+            
+            if(existingWorkerProject != null)
+            {
+                // Handle the situation (maybe show a message to the user)
+                throw new InvalidOperationException("Worker is already assigned to this project.");
+            }
+            else
+            {
+                // Call a method on the Worker entity to assign it to the project
+                worker.AddProject(project);
 
-            // Update the worker and the project in the database
-            _workerRepository.Update(worker);
-            _projectRepository.Update(project);
+                // Update the worker and the project in the database
+                _workerRepository.Update(worker);
+                _projectRepository.Update(project);
 
-            // Save changes to the database
-            _workerRepository.SaveChanges();
-            _projectRepository.SaveChanges();
+                // Save changes to the database
+                _workerRepository.SaveChanges();
+                _projectRepository.SaveChanges();
+            }
         }
+
         public void UnassignWorkerFromProject(int workerId, int projectId)
         {
             try
@@ -108,7 +121,7 @@ namespace CompanyManager.Services
             _qualificationRepository.Add(qualification);
             _qualificationRepository.SaveChanges();
         }
-        
+        */
     }
 
 }
