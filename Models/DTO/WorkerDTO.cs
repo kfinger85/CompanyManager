@@ -11,15 +11,23 @@ namespace CompanyManager.Models.DTO
         public string[] Projects { get; set; }
         public string[] Qualifications { get; set; }
 
+        public string Username { get; set; }
+        public string Password { get; set; }
+
+        public string CompanyName { get; set; }
+
         public WorkerDTO() { }
 
-        public WorkerDTO(string name, double salary, int workload, string[] projects, string[] qualifications)
+        public WorkerDTO(string name, double salary, int workload, 
+                        string[] projects, string[] qualifications, string username, string password)
         {
             Name = name;
             Salary = salary;
             Workload = workload;
             Projects = projects;
             Qualifications = qualifications;
+            Username = username;
+            Password = password;
         }
 
         public WorkerDTO SetName(string name)
@@ -49,6 +57,21 @@ namespace CompanyManager.Models.DTO
         public WorkerDTO SetQualifications(string[] qualifications)
         {
             Qualifications = qualifications;
+            return this;
+        }
+        public WorkerDTO SetUsername(string username)
+        {
+            Username = username;
+            return this;
+        }
+        public WorkerDTO SetPassword(string password)
+        {
+            Password = password;
+            return this;
+        }
+        public WorkerDTO SetCompanyName(string companyName)
+        {
+            CompanyName = companyName;
             return this;
         }
 
