@@ -72,8 +72,8 @@ namespace CompanyManager
                 }
             }
 
-            }catch{
-                    Debug.WriteLine("Error");
+            }catch(Exception e){
+                    Debug.WriteLine(e.Message);
             }finally{
               //  _context.Database.EnsureDeleted(); 
             }
