@@ -5,8 +5,8 @@ namespace CompanyManager.Models
     {
         public long Id { get; set; }
         public string Name { get; set; }
-        public virtual ICollection<Project> Projects { get; set; } = new HashSet<Project>();
-        public virtual ICollection<Worker> Workers { get; set; } = new HashSet<Worker>();
+        public ICollection<Project> Projects { get; set; } = new HashSet<Project>();
+        public ICollection<Worker> Workers { get; set; } = new HashSet<Worker>();
 
         public Qualification()
         {
