@@ -1,28 +1,13 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace CompanyManager.Models
 {
     public class Company
     {
         public long Id { get; set; }
-
         public string Name { get; set; }
-
         public virtual ICollection<Worker> Workers { get; set; } = new HashSet<Worker>();
-
-        [NotMapped]
-        public ICollection<Worker> AvailableWorkers { get; set; } = new HashSet<Worker>();
-
-        [NotMapped]
-        public ICollection<Worker> AssignedWorkers { get; set; } = new HashSet<Worker>();
-
         public virtual ICollection<Project> Projects { get; set; } = new HashSet<Project>();
-
         public virtual ICollection<Qualification> Qualifications { get; set; } = new HashSet<Qualification>();
-
 
         public Company()
         {
@@ -65,256 +50,67 @@ namespace CompanyManager.Models
 
         public override string ToString()
         {
-            return $"{Name}:{AvailableWorkers.Count}:{Projects.Count}";
+            return $"{Name}:{Workers.Count}:{Projects.Count}";
         }
-
-        public Worker CreateWorker(string name, ICollection<Qualification> qualifications, double salary)
-        {
-            using (var context = new CompanyManagerContext())
-            {
-                Worker newWorker;
-                try
-                {
-                    newWorker = new Worker(name, qualifications, salary);
-                    if (!qualifications.All(q => Qualifications.Contains(q)))
-                    {
-                        return null;
-                    }
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-
-                Workers.Add(newWorker);
-                AvailableWorkers.Add(newWorker);
-
-                ICollection<Qualification> toRemove = new List<Qualification>();
-                ICollection<Qualification> toAdd = new List<Qualification>();
-
-                foreach (Qualification companyQual in Qualifications)
-                {
-                    foreach (Qualification workerQual in qualifications)
-                    {
-                        if (workerQual.Equals(companyQual))
-                        {
-                            toRemove.Add(companyQual);
-                            Qualification newQual = companyQual;
-                            newQual.AddWorker(newWorker);
-                            toAdd.Add(newQual);
-                        }
-                    }
-                }
-
-                foreach (Qualification qualification in toRemove)
-                {
-                    Qualifications.Remove(qualification);
-                }
-
-                foreach (Qualification qualification in toAdd)
-                {
-                    Qualifications.Add(qualification);
-                }
-                context.SaveChanges(); 
-
-                return newWorker;
-            }
-        }
-
-    public Qualification CreateQualification(string description)
-    {
-        Qualification newQualification;
-        try
-        {
-            newQualification = new Qualification(description);
-        }
-        catch (Exception)
-        {
-            return null;
-        }
-
-        Qualifications.Add(newQualification);
-        return newQualification;
-    }
-
-        public Project CreateProject(string name, ICollection<Qualification> qualifications, ProjectSize size)
+        public Worker CreateWorker(string name, ICollection<Qualification> qualifications, double salary, string username, string password)
         {
             if (string.IsNullOrEmpty(name) || IsAllBlankSpace(name))
             {
-                return null;
+                throw new ArgumentException("Name must not be null or empty");
             }
 
-            if (qualifications == null || qualifications.Count == 0)
+            if (qualifications == null)
             {
-                return null;
+                throw new ArgumentNullException(nameof(qualifications));
             }
 
-            if (size == null)
+            if (string.IsNullOrEmpty(username) || IsAllBlankSpace(username))
             {
-                return null;
+                throw new ArgumentException("Username must not be null or empty");
             }
 
-            foreach (Qualification q in qualifications)
+            if (string.IsNullOrEmpty(password) || IsAllBlankSpace(password))
             {
-                if (!Qualifications.Contains(q))
+                throw new ArgumentException("Password must not be null or empty");
+            }
+
+            if (salary < 0)
+            {
+                throw new ArgumentException("Salary must be greater than or equal to 0");
+            }
+
+            Worker newWorker = new Worker(name, qualifications, salary, this, username, password);
+
+            ICollection<Qualification> toRemove = new List<Qualification>();
+            ICollection<Qualification> toAdd = new List<Qualification>();
+
+            foreach (Qualification companyQual in Qualifications)
+            {
+                foreach (Qualification workerQual in qualifications)
                 {
-                    return null;
+                    if (workerQual.Equals(companyQual))
+                    {
+                        toRemove.Add(companyQual);
+                        companyQual.AddWorker(workerQual, newWorker);
+                        toAdd.Add(companyQual);
+                    }
                 }
             }
 
-            Project project = new Project(name, qualifications, size);
-            Projects.Add(project);
-            return project;
+            foreach (Qualification qualification in toRemove)
+            {
+                Qualifications.Remove(qualification);
+            }
+
+            foreach (Qualification qualification in toAdd)
+            {
+                Qualifications.Add(qualification);
+            }
+
+            Workers.Add(newWorker);
+            return newWorker; // Return the newly created worker
+
         }
 
-        public void Start(Project project)
-        {
-            if (project.Status == ProjectStatus.ACTIVE || project.Status == ProjectStatus.FINISHED)
-            {
-                throw new ArgumentException("Project is not in a valid state to be started");
-            }
-
-            if (!Projects.Contains(project))
-            {
-                throw new ArgumentException("Project is not associated with this company");
-            }
-
-            if (project.missingQualifications.Count > 0)
-            {
-                throw new ArgumentException("Project has missing qualifications and cannot be started");
-            }
-
-            project.Status = ProjectStatus.ACTIVE;
-        }
-
-        public void Finish(Project project)
-        {
-            if (project.Status == ProjectStatus.SUSPENDED || project.Status == ProjectStatus.FINISHED || project.Status == ProjectStatus.PLANNED)
-            {
-                throw new ArgumentException("Project is not active");
-            }
-
-            if (!Projects.Contains(project))
-            {
-                throw new ArgumentException("Project is not associated with this company");
-            }
-
-            ICollection<Worker> workersCopy = new List<Worker>(project.GetWorkers());
-
-            foreach (Worker worker in workersCopy)
-            {
-                Unassign(worker, project);
-            }
-
-            project.Status = ProjectStatus.FINISHED;
-        }
-
-        public void Assign(Worker worker, Project project)
-        {
-            if (worker == null)
-            {
-                throw new ArgumentNullException("Worker must not be null");
-            }
-
-            if (project == null)
-            {
-                throw new ArgumentNullException("Project must not be null");
-            }
-
-            if (!Projects.Contains(project) || !Workers.Contains(worker))
-            {
-                throw new ArgumentException("Worker and Project must be associated with this company");
-            }
-
-            if (project.Status == ProjectStatus.ACTIVE || project.Status == ProjectStatus.FINISHED)
-            {
-                throw new ArgumentException("Project is not in a valid state to be assigned");
-            }
-
-            if (!AvailableWorkers.Contains(worker) || worker.GetProjects().Contains(project))
-            {
-                throw new ArgumentException("Worker must be available and not already assigned to the project");
-            }
-
-            if (!CanAssign(worker, project))
-            {
-                throw new ArgumentException("Cannot assign worker to the project");
-            }
-
-            AssignedWorkers.Add(worker);
-            worker.AddProject(project);
-            project.AddWorker(worker);
-
-            if (worker.GetWorkload() == Worker.MAX_WORKLOAD)
-            {
-                AvailableWorkers.Remove(worker);
-            }
-        }
-
-        private bool CanAssign(Worker worker, Project project)
-        {
-            return !worker.WillOverload(project) && project.IsHelpful(worker);
-        }
-
-        public void Unassign(Worker worker, Project project)
-        {
-            if (worker == null)
-            {
-                throw new ArgumentNullException("Worker must not be null");
-            }
-
-            if (project == null)
-            {
-                throw new ArgumentNullException("Project must not be null");
-            }
-
-            if (!Projects.Contains(project) || !Workers.Contains(worker))
-            {
-                throw new ArgumentException("Worker and Project must be associated with this company");
-            }
-
-            if (worker.GetProjects().Contains(project))
-            {
-                project.RemoveWorker(worker);
-                worker.RemoveProject(project);
-            }
-            else
-            {
-                throw new ArgumentException("Worker is not assigned to the project");
-            }
-
-             if (!worker.GetProjects().Any()) // Updated line
-            {
-                AssignedWorkers.Remove(worker);
-            }
-
-            if (!AvailableWorkers.Contains(worker))
-            {
-                AvailableWorkers.Add(worker);
-            }
-
-            if (project.Status == ProjectStatus.ACTIVE && project.missingQualifications.Count > 0)
-            {
-                project.Status = ProjectStatus.SUSPENDED;
-            }
-        }
-
-        public void UnassignAll(Worker worker)
-        {
-            if (worker == null)
-            {
-                throw new ArgumentNullException("Worker must not be null");
-            }
-
-            if (!Workers.Contains(worker))
-            {
-                throw new ArgumentException("Worker is not associated with this company");
-            }
-
-            foreach (Project project in worker.GetProjects())
-            {
-                Unassign(worker, project);
-            }
-        }
     }
 }
