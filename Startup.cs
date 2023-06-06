@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
 using CompanyManager.Repositories;
+using CompanyManager.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 
@@ -32,6 +33,12 @@ namespace CompanyManager
             services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddScoped<IWorkerRepository, WorkerRepository>();
             services.AddScoped<IProjectRepository, ProjectRepository>(); 
+            services.AddScoped<WorkerService, WorkerService>();
+            services.AddScoped<CompanyService, CompanyService>();
+            services.AddScoped<ProjectService, ProjectService>();
+            services.AddScoped<QualificationService, QualificationService>();
+            
+
 
             services.AddCors(options =>
             {
@@ -40,17 +47,25 @@ namespace CompanyManager
                     {
                         builder.WithOrigins("http://localhost:3000") // React app's url
                             .AllowAnyHeader()
-                            .AllowAnyMethod();
+                            .AllowCredentials()
+                            .AllowAnyMethod()
+                            .WithExposedHeaders("Access-Control-Allow-Origin");
                     });
-            });  
-                     
+            });
+            services.AddControllersWithViews()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.MaxDepth = 64; // Increase the maximum allowed depth
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, CompanyManagerContext dbContext)
         {
-            
-            app.UseHttpsRedirection();
+            dbContext.Database.EnsureDeleted();
+
+            app.UseCors("AllowReactApp");
+            // app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -59,23 +74,20 @@ namespace CompanyManager
 
                 // Apply pending migrations and create the database
                 // dbContext.Database.Migrate();
-                dbContext.Database.EnsureCreated();
+            dbContext.Database.EnsureCreated();
 
-                app.UseStaticFiles(); // For the wwwroot folder
+                CompanyInitializer companyInitializer = new CompanyInitializer(dbContext);
+                companyInitializer.Initialize();
+                // app.UseStaticFiles(); // For the wwwroot folder
 
-                app.UseStaticFiles(new StaticFileOptions
-                {
-                    FileProvider = new PhysicalFileProvider(
-                        Path.Combine(Directory.GetCurrentDirectory(), "ClientApp/build")),
-                    RequestPath = "" // empty RequestPath means serve from the root
-                });
 
-                app.UseCors("AllowReactApp");
-
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapControllers();
-                });
+            app.UseEndpoints(endpoints =>
+            {
+                // Configure your desired endpoints here
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+            });
         }
     }
 }
