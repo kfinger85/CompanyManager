@@ -11,6 +11,7 @@
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/bin/Debug/net6.0/CompanyManager.dll",
             "args": [],
+            "console": "internalConsole",
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "serverReadyAction": {
@@ -28,6 +29,16 @@
             "name": ".NET Core Attach",
             "type": "coreclr",
             "request": "attach"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "React: Chrome",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}/ClientApp/src",
+            "sourceMapPathOverrides": {
+              "webpack:///src/*": "${webRoot}/*"
+            }
         }
     ]
 }
