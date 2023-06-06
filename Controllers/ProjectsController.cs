@@ -93,35 +93,80 @@ namespace CompanyManager.Controllers
             }catch(Exception e){
                 return BadRequest(e.Message);
             }
+
+         
+
+    }
+        [HttpPost("projects/unassign")]
+        public IActionResult UnassignWorkerFromProject([FromBody] AssignDTO assignDTO)
+        {
+            var project = assignDTO.ProjectName;
+            var worker = assignDTO.WorkerName;
+
+            var projectToUnassign = _context.Projects
+                .IncludeAllProjectRelations()
+                .FirstOrDefault(p => p.Name == project);
+
+            var workerToUnassign = _context.Workers
+                .IncludeAllWorkerRelations()
+                .FirstOrDefault(w => w.Name == worker);
+
+            if (projectToUnassign == null || workerToUnassign == null)
+            {
+                return NotFound("Project or worker not found.");
+            }
+
+            var workerProject = _context.WorkerProject
+                .FirstOrDefault(wp => wp.WorkerId == projectToUnassign.Id && wp.ProjectId == workerToUnassign.Id);
+            if (workerProject == null)
+            {
+               return NotFound("Worker not assigned to project.");
+            }
+
+            foreach (var qualification in workerToUnassign.Qualifications)
+            {
+                var projectQualification = projectToUnassign.Qualifications.FirstOrDefault(q => q.Id == qualification.Id);
+                if (projectQualification != null)
+                {
+                    projectToUnassign.MissingQualifications.Add(new MissingQualification(projectToUnassign, qualification, qualification.Name));
+                }
+            }
+
+            _context.WorkerProject.Remove(workerProject);
+            projectToUnassign.WorkerProjects.Remove(workerProject);
+            workerToUnassign.WorkerProjects.Remove(workerProject);
+            _context.SaveChanges();
+
+
+            return Ok();
+        }
+        public class AssignDTO
+        {
+            public string ProjectName { get; set; }
+            public string WorkerName { get; set; }
         }
 
     }
-public class AssignDTO
+        public static class QueryExtensions
     {
-        public string ProjectName { get; set; }
-        public string WorkerName { get; set; }
-    }
+        public static IQueryable<Project> IncludeAllProjectRelations(this IQueryable<Project> query)
+        {
+            return query
+                .Include(p => p.WorkerProjects)
+                    .ThenInclude(wp => wp.Worker)
+                        .ThenInclude(w => w.Qualifications)
+                .Include(p => p.Company)
+                .Include(p => p.Qualifications)
+                .Include(p => p.MissingQualifications);
+        }
 
-    public static class QueryExtensions
-{
-    public static IQueryable<Project> IncludeAllProjectRelations(this IQueryable<Project> query)
-    {
-        return query
-            .Include(p => p.WorkerProjects)
-                .ThenInclude(wp => wp.Worker)
-                    .ThenInclude(w => w.Qualifications)
-            .Include(p => p.Company)
-            .Include(p => p.Qualifications)
-            .Include(p => p.MissingQualifications);
+        public static IQueryable<Worker> IncludeAllWorkerRelations(this IQueryable<Worker> query)
+        {
+            return query
+                .Include(w => w.WorkerProjects)
+                    .ThenInclude(wp => wp.Project)
+                .Include(w => w.Qualifications)
+                .Include(w => w.Company);
+        }
     }
-
-    public static IQueryable<Worker> IncludeAllWorkerRelations(this IQueryable<Worker> query)
-    {
-        return query
-            .Include(w => w.WorkerProjects)
-                .ThenInclude(wp => wp.Project)
-            .Include(w => w.Qualifications)
-            .Include(w => w.Company);
-    }
-}
 }
