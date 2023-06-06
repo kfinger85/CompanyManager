@@ -23,10 +23,10 @@ namespace CompanyManager
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             string connectionStringKey = isWindows ? "DefaultConnection" : "LinuxConnection";
 
-            services.AddControllersWithViews();
-            
+            // services.AddControllersWithViews();
+            services.AddControllers(); //  Add only the services for the controllers to the DI container, without the view related services
             services.AddDbContext<CompanyManagerContext>(options => options
-                .UseMySql(Configuration.GetConnectionString(connectionStringKey), 
+                .UseMySql(Configuration.GetConnectionString(connectionStringKey),
                     new MySqlServerVersion(new Version(8, 0, 26)))
             );
             services.AddScoped<IQualificationRepository, QualificationRepository>();
