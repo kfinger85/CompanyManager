@@ -5,9 +5,9 @@ namespace CompanyManager.Models
     {
         public long Id { get; set; }
         public string Name { get; set; }
-        public virtual ICollection<Worker> Workers { get; set; } = new HashSet<Worker>();
-        public virtual ICollection<Project> Projects { get; set; } = new HashSet<Project>();
-        public virtual ICollection<Qualification> Qualifications { get; set; } = new HashSet<Qualification>();
+        public  ICollection<Worker> Workers { get; set; } = new HashSet<Worker>();
+        public  ICollection<Project> Projects { get; set; } = new HashSet<Project>();
+        public  ICollection<Qualification> Qualifications { get; set; } = new HashSet<Qualification>();
 
         public Company()
         {
