@@ -9,9 +9,7 @@ namespace CompanyManager.Models
 
         public virtual String Name { get; set; }
 
-        [NotMapped]
         public virtual Project Project { get; set; }
-        [NotMapped]
         public virtual Qualification Qualification { get; set; }
         public MissingQualification() { }
         public MissingQualification(Project project, Qualification qualification, String name)
