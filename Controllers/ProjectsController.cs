@@ -1,28 +1,127 @@
 using Microsoft.AspNetCore.Mvc;
-using CompanyManager.Repositories;
+using System.Diagnostics;
+using System.Text.Json;
+using CompanyManager.Models;
+using CompanyManager.Services;
+using Microsoft.EntityFrameworkCore;
+
 namespace CompanyManager.Controllers
 {
     public class ProjectController : Controller
     {
-        private readonly IProjectRepository _projectRepository;
-        public ProjectController(IProjectRepository projectRepository)
+        private readonly CompanyManagerContext _context;
+        private readonly CompanyService _companyService;
+        public ProjectController(CompanyManagerContext context, CompanyService companyService)
         {
-            _projectRepository = projectRepository;
+            _context = context;
+            _companyService = companyService;
         }
         [HttpGet("projects")]
         public IActionResult Index()
         {
-            return Ok(_projectRepository.GetAll());
+        var projects = _context.Projects
+            .Select(p => new {
+                MissingQualifications = p.MissingQualifications.Select(mq => mq.Name),
+                Size = p.Size.ToString(),
+                p.Name,
+                Status = p.Status.ToString(),
+                Qualifications = p.Qualifications.Select(q => q.Name),
+                Workers = _context.WorkerProject
+                    .Where(wp => wp.ProjectId == p.Id)
+                    .Select(wp => wp.Worker.Name).ToList()
+            })
+            .ToList();
+            
+            Debug.WriteLine(JsonSerializer.Serialize(projects)); // Log the JSON object
+            return Ok(projects);
         }
-        [HttpGet("projects/{id}")]
-        public IActionResult Details(int id)
+        [HttpGet("projects/{name}")]
+        public IActionResult Details(string name)
         {
-            var project = _projectRepository.GetById(id);
+            var project = _context.Projects
+                .Where(p => p.Name == name)
+                .Select(p => new {
+                    MissingQualifications = p.MissingQualifications.Select(mq => mq.Name),
+                    Size = p.Size.ToString(),
+                    p.Name,
+                    Status = p.Status.ToString(),
+                    Qualifications = p.Qualifications.Select(q => q.Name),
+                    Workers = _context.WorkerProject
+                        .Where(wp => wp.ProjectId == p.Id)
+                        .Select(wp => wp.Worker.Name).ToList()
+                })
+                .FirstOrDefault();
+
             if (project == null)
             {
-                return NotFound();
+                return NotFound("Project not found.");
             }
+
+            Debug.WriteLine(JsonSerializer.Serialize(project)); // Log the JSON object
             return Ok(project);
         }
+        [HttpPost("projects/assign")]
+        public IActionResult Assign([FromBody] AssignDTO assignDTO)
+        {
+            try{
+            var project = assignDTO.ProjectName;
+            var worker = assignDTO.WorkerName;
+
+            var projectToAssign = _context.Projects
+                .IncludeAllProjectRelations()
+                .FirstOrDefault(p => p.Name == project);
+
+            var workerToAssign = _context.Workers
+                .IncludeAllWorkerRelations()
+                .FirstOrDefault(w => w.Name == worker);
+
+            if (projectToAssign == null)
+            {
+                return NotFound("Project not found.");
+            }
+
+            if (workerToAssign == null)
+            {
+                return NotFound("Worker not found.");
+            }
+
+            _companyService.AssignWorkerToProject(workerToAssign, projectToAssign);
+            _context.SaveChanges();
+
+
+            return Ok();
+            }catch(Exception e){
+                return BadRequest(e.Message);
+            }
+        }
+
     }
+public class AssignDTO
+    {
+        public string ProjectName { get; set; }
+        public string WorkerName { get; set; }
+    }
+
+    public static class QueryExtensions
+{
+    public static IQueryable<Project> IncludeAllProjectRelations(this IQueryable<Project> query)
+    {
+        return query
+            .Include(p => p.WorkerProjects)
+                .ThenInclude(wp => wp.Worker)
+                    .ThenInclude(w => w.Qualifications)
+            .Include(p => p.Company)
+            .Include(p => p.Qualifications)
+            .Include(p => p.MissingQualifications);
+    }
+
+    public static IQueryable<Worker> IncludeAllWorkerRelations(this IQueryable<Worker> query)
+    {
+        return query
+            .Include(w => w.WorkerProjects)
+                .ThenInclude(wp => wp.Project)
+            .Include(w => w.Qualifications)
+            .Include(w => w.Company);
+    }
+}
 }
