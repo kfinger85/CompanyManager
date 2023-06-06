@@ -21,7 +21,7 @@ namespace CompanyManager.Models
         {
             Worker = worker;
             Project = project;
-            DateAssigned = DateTime.Now.ToString("yyyy-MM-dd");
+            DateAssigned = DateTime.Now.ToString("yyyy-MM-dd:HH:mm:ss");
         }
 
         public Project GetProject()
