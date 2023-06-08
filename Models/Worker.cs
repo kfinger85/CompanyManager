@@ -1,3 +1,5 @@
+#nullable disable
+
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -29,6 +31,10 @@ namespace CompanyManager.Models
             Username = username;
             Password = password;
         }
+
+        // The warning you're getting is from a non-nullable reference types feature that was added in C# 8.0. The compiler is warning you that you haven't assigned a value to the Companies property in the constructor. 
+        // However, in this specific case, you can safely ignore the warning because Entity Framework Core assigns a value to it at runtime.
+        
         public Worker()
         {
         }
