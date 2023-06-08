@@ -1,6 +1,11 @@
+#nullable disable
+
+
 using System.Text.RegularExpressions;
 using CompanyManager.Models;
+using CompanyManager.Logging;
 using Microsoft.EntityFrameworkCore;
+
 
 namespace CompanyManager.Services
 {
@@ -28,17 +33,22 @@ namespace CompanyManager.Services
         {
             if (string.IsNullOrEmpty(name) || IsAllBlankSpace(name))
             {
+                Logger.LogError("Company name must not be null or blank");
                 throw new ArgumentException("Company name must not be null or blank");
             }
 
             if (_context.Companies.Any(c => c.Name == name))
             {
+                Logger.LogError("Company name must be unique");
                 throw new ArgumentException("Company name must be unique");
             }
 
             _company = new Company(name);
             _context.Companies.Add(_company);
             _context.SaveChanges();
+
+            Logger.LogInformation($"Created company with name {name}");
+
 
             return _company;
         }
@@ -120,17 +130,21 @@ namespace CompanyManager.Services
 
             if (string.IsNullOrEmpty(username) || IsAllBlankSpace(username))
             {
+                Logger.LogError("Worker name must not be null or blank");
                 throw new ArgumentException("Worker username must not be null or blank");
             }
 
             if (string.IsNullOrEmpty(password) || IsAllBlankSpace(password))
             {
+                Logger.LogError("Worker name must not be null or blank");
                 throw new ArgumentException("Worker password must not be null or blank");
             }
 
             Worker worker = new Worker(name, qualifications, salary, _company, username, password);
             _context.Workers.Add(worker);
             _context.SaveChanges();
+            Logger.LogInformation($"Created worker with name {name}");
+
             return worker;
         }
 
@@ -138,26 +152,31 @@ namespace CompanyManager.Services
         {
             if (worker == null)
             {
+                Logger.LogInformation($"Worker must not be null");
                 throw new ArgumentException("Worker must not be null");
             }
 
             if (project == null)
             {
+                Logger.LogInformation($"Project must not be null");
                 throw new ArgumentException("Project must not be null");
             }
 
             if (worker.Company != project.Company)
             {
+                Logger.LogInformation($"Worker {worker.Name} must be from the same company as the project {project.Name}");
                 throw new ArgumentException("Worker must be from the same company as the project");
             }
 
             if (project.Company != worker.Company)
             {
+                Logger.LogInformation($"Project {project.Name} must be from the same company as the worker {worker.Name}");
                 throw new ArgumentException("Project must be from the same company as the worker");
             }
 
             if (worker.WorkerProjects.Any(wp => wp.Project == project))
             {
+                Logger.LogInformation($"Worker {worker.Name} is already assigned to project {project.Name}");
                 throw new ArgumentException("Worker is already assigned to project");
             }
 
@@ -165,15 +184,20 @@ namespace CompanyManager.Services
             {
                 if (!worker.Qualifications.Contains(q))
                 {
-                    throw new ArgumentException("Worker does not have the required qualifications to be assigned to project");
+                    string message = $"{worker.Name}: Worker does not have the required qualifications to be assigned to project";
+                    Logger.LogInformation(message);
+                    throw new ArgumentException(message);
                 }
             }
         foreach (Qualification q in worker.Qualifications)
         {
+            // var miss = MissingQualification.CreateMissingQualification(q, project);
+
             var missingQualification = project.MissingQualifications
                 .FirstOrDefault(mq => mq.QualificationId == q.Id && mq.ProjectId == project.Id);
             if (missingQualification != null)
             {
+                Logger.LogInformation($"Removed missing qualification {missingQualification.Qualification.Name} from project {project.Name} because worker {worker.Name} has it");
                 project.MissingQualifications.Remove(missingQualification);
             }
         }
@@ -182,6 +206,7 @@ namespace CompanyManager.Services
             worker.WorkerProjects.Add(workerProject);
             _context.WorkerProject.Add(workerProject); // Add WorkerProject to the context
             _context.SaveChanges();
+            Logger.LogInformation($"Assigned worker {worker.Name} to project {project.Name}");
             return true;
         }
 
@@ -189,35 +214,41 @@ namespace CompanyManager.Services
         {
             if (worker == null)
             {
+                Logger.LogInformation($"Worker must not be null");
                 throw new ArgumentException("Worker must not be null");
             }
 
             if (project == null)
             {
+                Logger.LogInformation($"Project must not be null");
                 throw new ArgumentException("Project must not be null");
             }
 
             if (worker.Company != project.Company)
             {
+                Logger.LogInformation($"Worker {worker.Name} must be from the same company as the project {project.Name}");
                 throw new ArgumentException("Worker must be from the same company as the project");
             }
 
             if (project.Company != worker.Company)
             {
+                Logger.LogInformation($"Project {project.Name} must be from the same company as the worker {worker.Name}");
                 throw new ArgumentException("Project must be from the same company as the worker");
             }
 
             if (!worker.WorkerProjects.Any(wp => wp.Project == project))
             {
+                Logger.LogInformation($"Worker {worker.Name} is not assigned to project {project.Name}");
                 throw new ArgumentException("Worker is not assigned to project");
             }
             WorkerProject workerProject = worker.WorkerProjects.FirstOrDefault(wp => wp.Project == project);
             
             foreach (Qualification q in worker.Qualifications)
             {
-                var missingQualification = MissingQualification.QualificationToMissingQualification(project, q);
-                if (!project.MissingQualifications.Contains(q))
+                var tempMissingQualification = MissingQualification.QualificationToMissingQualification(project, q);
+                if (!project.MissingQualifications.Contains(tempMissingQualification))
                 {
+                    Logger.LogInformation($"Added missing qualification {q.Name} to project {project.Name} because outgoing worker {worker.Name} satisfied it and no other worker does");
                     var missingQualification = new MissingQualification(project, q, q.Name); 
                     project.MissingQualifications.Add(missingQualification);
                 }
@@ -226,6 +257,7 @@ namespace CompanyManager.Services
             worker.WorkerProjects.Remove(workerProject);
             _context.WorkerProject.Remove(workerProject); // Remove WorkerProject from the context
             _context.SaveChanges();
+            Logger.LogInformation($"Unassigned worker {worker.Name} from project {project.Name}");
             return true;
         }
 

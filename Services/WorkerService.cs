@@ -1,4 +1,7 @@
+#nullable enable
+
 using CompanyManager.Models;
+using CompanyManager.Logging;
 
 namespace CompanyManager.Services
 {
@@ -19,16 +22,18 @@ namespace CompanyManager.Services
             return project.WorkerProjects.Select(wp => wp.Worker);
         }
 
-        public Worker GetWorkerById(int id)
+        /// <summary>
+        /// Retrieves a Worker entity with a specific Id from the Workers table of the database.
+        /// </summary>
+        public Worker? GetWorkerById(int id)
         {
             return _context.Workers.Find(id);
         }
-
-        public Worker GetWorkerByName(string name)
+        public Worker? GetWorkerByName(string name)
         {
             return _context.Workers.FirstOrDefault(w => w.Name == name);        
             
-            }
+        }
 
 
         /// <summary>
@@ -70,6 +75,7 @@ namespace CompanyManager.Services
 
             _context.Workers.Add(worker);
             _context.SaveChanges();
+            Logger.LogInformation($"Worker {worker.Name} was created");
 
             return worker;
         }
@@ -98,6 +104,7 @@ namespace CompanyManager.Services
             }
 
             _context.SaveChanges();
+            Logger.LogInformation($"Project {project.Name} was created");
             return true;
         }
         /// <summary>
@@ -108,6 +115,7 @@ namespace CompanyManager.Services
         {
             if (project == null)
             {
+                Logger.LogError("Project must not be null");
                 return (false, "Project must not be null");
             }
 
@@ -127,8 +135,8 @@ namespace CompanyManager.Services
 
                     }
                 }
-
                 _context.SaveChanges();
+                Logger.LogInformation($"Project {project.Name} was removed");   
                 return (true, string.Empty);
             }
             return (false, "Project not found");
