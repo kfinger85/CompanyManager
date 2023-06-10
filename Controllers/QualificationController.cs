@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using CompanyManager.Repositories;
+
+
 using System.Diagnostics;
 using System.Text.Json;
 
@@ -7,11 +8,9 @@ namespace CompanyManager.Controllers
 {
     public class QualificationController : Controller
     {
-        private readonly IQualificationRepository _qualificationRepository;
         private readonly CompanyManagerContext _context;
-        public QualificationController(IQualificationRepository qualificationRepository, CompanyManagerContext context)
+        public QualificationController(CompanyManagerContext context)
         {
-            _qualificationRepository = qualificationRepository;
             _context = context;
         }
         [HttpGet("qualifications")]
@@ -24,14 +23,21 @@ namespace CompanyManager.Controllers
                 
                 })  // Select the Name of each qualification
                 .ToList();
+                #if DEBUG
                 Debug.WriteLine(JsonSerializer.Serialize(qualifications)); // Log the JSON object
-
+                #endif
                 return Ok(qualifications);
         }
         [HttpGet("qualifications/{name}")]
         public IActionResult Details(string name)
         {
-            var qualification = _qualificationRepository.GetByName(name);
+            var qualification = _context.Qualifications.
+            Select(q => new {q.Name, 
+                Workers = q.Workers.Select(w => w.Name).ToArray().ToArray(), // Select the Name of each worker
+                Projects = q.Projects.Select(p => p.Name).ToArray() // Select the Name of each project
+                
+                })  // Select the Name of each qualification
+                .FirstOrDefault(q => q.Name == name);
             if (qualification == null)
             {
                 return NotFound();
