@@ -31,6 +31,15 @@ namespace CompanyManager.Models
             }
             Status = ProjectStatus.PLANNED;
         }
+        public class ProjectDTO
+        {
+            public IEnumerable<string> MissingQualifications { get; set; }
+            public string Size { get; set; }
+            public string Name { get; set; }
+            public string Status { get; set; }
+            public IEnumerable<string> Qualifications { get; set; }
+            public List<string> Workers { get; set; }
+        }
 
     }
 }
