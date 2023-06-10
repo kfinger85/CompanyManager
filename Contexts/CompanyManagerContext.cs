@@ -1,5 +1,10 @@
+#nullable disable
+
 using CompanyManager.Models;
+
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 public class CompanyManagerContext : DbContext
 {
@@ -23,16 +28,48 @@ public class CompanyManagerContext : DbContext
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-{
-    if (!optionsBuilder.IsConfigured)
     {
-        // Enable logging with parameter values
-        optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
+        if (!optionsBuilder.IsConfigured)
+        {
+            // Enable logging with parameter values
+            optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
+        }
     }
-}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+                base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<IdentityUserLogin<string>>(entity =>
+        {
+            entity.HasKey(e => new { e.LoginProvider, e.ProviderKey });
+        });
+
+
+    modelBuilder.Entity<ApplicationUser>()
+        .HasKey(l => l.Id);
+        
+        modelBuilder.Entity<ApplicationUser>()
+            .Property(u => u.AccessFailedCount)
+            .IsRequired();
+
+    // Configure other properties as needed
+
+    // Configure relationships
+        modelBuilder.Entity<ApplicationUser>()
+            .HasMany(u => u.Claims)
+            .WithOne()
+            .HasForeignKey(c => c.UserId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ApplicationUser>()
+            .HasMany(u => u.Logins)
+            .WithOne()
+            .HasForeignKey(l => l.UserId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Project>()
             .Property(p => p.Size)
