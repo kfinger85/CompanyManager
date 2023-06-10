@@ -1,38 +1,22 @@
-﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using CompanyManager.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace CompanyManager.Controllers;
 
 public class HomeController : Controller
 {
-    /*
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
-    {
-        _logger = logger;
-    }
-
-    public IActionResult Index()
-    {
-        return View();
-    }
-
-    public IActionResult Privacy()
-    {
-        return View();
-    }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
-    */
         [Route("/")]
         public IActionResult Index()
         {
-            return PhysicalFile(Path.Combine(Directory.GetCurrentDirectory(), "ClientApp", "build", "index.html"), "text/HTML");
+        var info = new 
+        {
+            OS = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
+            ProcessorCount = Environment.ProcessorCount,
+            WorkingSet = Environment.WorkingSet,
+            MachineName = Environment.MachineName,
+            SystemPageSize = Environment.SystemPageSize,
+            Version = Environment.Version.ToString(), 
+            NewLine = Environment.NewLine 
+        };
+            return Ok(info);
         }
 }
