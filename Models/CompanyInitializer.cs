@@ -1,5 +1,6 @@
 using CompanyManager.Models;
 using CompanyManager.Services;
+using CompanyManager.Logging;
 using Bogus;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -16,67 +17,68 @@ namespace CompanyManager
         private readonly ProjectService _projectService;
         private readonly WorkerService _workerService;
 
-        public CompanyInitializer(CompanyManagerContext context)
+        public CompanyInitializer(
+            CompanyManagerContext context, 
+            CompanyService companyService, 
+            QualificationService qualificationService,
+            ProjectService projectService,
+            WorkerService workerService)
         {
             _context = context;
-            _companyService = new CompanyService(_context);
-            _qualificationService = new QualificationService(_context);
-            _projectService = new ProjectService(_context);
-            _workerService = new WorkerService(_context);
+            _companyService = companyService;
+            _qualificationService = qualificationService;
+            _projectService = projectService;
+            _workerService = workerService;
         }
 
         public void Initialize()
         {
-            try{
+    
+          
+                    ExecuteInTransaction(CreateOneWorker);
+                    
+                    /*
+                    ExecuteInTransaction(CreateCompany);
+                    ExecuteInTransaction(CreateQualification);
+                    ExecuteInTransaction(CreateProject);
+                    ExecuteInTransaction(CreateWorker);
+                    ExecuteInTransaction(AssignWorkerToProject);
+                    */
+
+                    foreach (var entry in _context.ChangeTracker.Entries())
+                    {
+                        if (entry.State == EntityState.Added)
+                        {
+                            Console.WriteLine($"Entity of type {entry.Entity.GetType().Name} was added.");
+                        }
+                        else if (entry.State == EntityState.Modified)
+                        {
+                            Console.WriteLine($"Entity of type {entry.Entity.GetType().Name} was modified.");
+                        }
+                        else if (entry.State == EntityState.Deleted)
+                        {
+                            Console.WriteLine($"Entity of type {entry.Entity.GetType().Name} was deleted.");
+                        }
+                    }
+        }
+
+        private void CreateOneWorker()
+        {
             var faker = new Bogus.Faker();
             _company = _companyService.CreateCompany("Test Company");
-             var qualifications = new[] { "Java", "C#", "Python"};
+            var qualifications = new[] { "Java", "C#", "Python" };
             foreach (var qualificationName in qualifications)
             {
                 _qualificationService.CreateQualification(qualificationName);
             }
-
             var projectQualifications = _qualificationService.GetQualifications();
-
-            Project project = _projectService.CreateProject("Test Project", projectQualifications, ProjectSize.SMALL, _company);  
-            Project project2 = _projectService.CreateProject("Test Project Missing", projectQualifications, ProjectSize.SMALL, _company);  
-
+            Project project = _projectService.CreateProject("Test Project", projectQualifications, ProjectSize.SMALL, _company);
+            Project project2 = _projectService.CreateProject("Test Project Missing", projectQualifications, ProjectSize.SMALL, _company);
             string name = "Kevin Finger";
             string username = name.Split(' ')[0].ToLower() + name.Split(' ')[1].ToLower() + faker.Random.Int(1, 1000);
-            
             var qualificationsObjects = _qualificationService.GetQualifications();
-
             Worker worker = _companyService.CreateWorker(name, qualificationsObjects, 696969.69, username, "password");
             _companyService.AssignWorkerToProject(worker, project);
-            /*
-            ExecuteInTransaction(CreateCompany);
-            ExecuteInTransaction(CreateQualification);
-            ExecuteInTransaction(CreateProject);
-            ExecuteInTransaction(CreateWorker);
-            ExecuteInTransaction(AssignWorkerToProject);
-            */
-
-            foreach (var entry in _context.ChangeTracker.Entries())
-            {
-                if (entry.State == EntityState.Added)
-                {
-                    Console.WriteLine($"Entity of type {entry.Entity.GetType().Name} was added.");
-                }
-                else if (entry.State == EntityState.Modified)
-                {
-                    Console.WriteLine($"Entity of type {entry.Entity.GetType().Name} was modified.");
-                }
-                else if (entry.State == EntityState.Deleted)
-                {
-                    Console.WriteLine($"Entity of type {entry.Entity.GetType().Name} was deleted.");
-                }
-            }
-
-            }catch(Exception e){
-                    Debug.WriteLine(e.Message);
-            }finally{
-              //  _context.Database.EnsureDeleted(); 
-            }
         }
 
         private void ExecuteInTransaction(Action method)
@@ -86,7 +88,6 @@ namespace CompanyManager
                 try
                 {
                     method();
-                    // _context.SaveChanges();
                     transaction.Commit();
                 }
                 catch
@@ -138,7 +139,7 @@ namespace CompanyManager
 
         private void AssignWorkerToProject()
         {
-            var projects = _projectService.GetProjects();
+            var projects = _projectService.FetchAllProjects();
             var workers = _workerService.GetWorkers();
 
             // Loop through all the projects
