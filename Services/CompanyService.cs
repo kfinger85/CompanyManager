@@ -13,14 +13,12 @@ namespace CompanyManager.Services
     {
         private readonly CompanyManagerContext _context;
 
-        private readonly ProjectService _projectService;
 
         private Company _company;
 
         public CompanyService(CompanyManagerContext context)
         {
             _context = context;
-            _projectService = new ProjectService(_context);
 
         }
 

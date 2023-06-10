@@ -1,21 +1,64 @@
 using Microsoft.EntityFrameworkCore;
 using CompanyManager.Models;
+using CompanyManager.Logging;
+using Microsoft.AspNetCore.Mvc;
+
 namespace CompanyManager.Services
 {
     public class ProjectService
     {
         private readonly CompanyManagerContext _context;
+        private readonly WorkerService _workerService;
+        private readonly ILogger<ProjectService> _logger;
+
         
-        public ProjectService(CompanyManagerContext context)
+        public ProjectService(CompanyManagerContext context, WorkerService workerService, ILogger<ProjectService> logger)
         {
             _context = context;
+            _workerService = workerService;
+            _logger = logger;
         }
 
-        public IEnumerable<Project> GetProjects()
+        /// <summary>
+        /// Fetches all projects and returns them as a list of type ProjectDTOs.
+        /// </summary>
+        public ICollection<Project.ProjectDTO> FetchAllProjectDTOs()
+        {
+            var projects = _context.Projects
+                .Select(p => new Project.ProjectDTO {
+                    MissingQualifications = p.MissingQualifications.Select(mq => mq.Name),
+                    Size = p.Size.ToString(),
+                    Name = p.Name,
+                    Status = p.Status.ToString(),
+                    Qualifications = p.Qualifications.Select(q => q.Name),
+                    Workers = _context.WorkerProject
+                        .Where(wp => wp.ProjectId == p.Id)
+                        .Select(wp => wp.Worker.Name)
+                        .ToList()
+                })
+                .ToList();
+
+                return projects;
+        }
+        /// <summary>
+        /// Fetches all projects with return type Collections.Generic.List<Project>.
+        /// </summary>
+        public IEnumerable<Project> FetchAllProjects()
         {
             return _context.Projects.ToList();
         }
 
+
+        public Project GetProjectByName(string name)
+        {
+            return _context.Projects
+                .Include(p => p.Company)
+                .Include(p => p.Qualifications)
+                .Include(p => p.MissingQualifications)
+                .Include(p => p.WorkerProjects)
+                    .ThenInclude(wp => wp.Worker)
+                .FirstOrDefault(p => p.Name == name);
+        }
         public Project CreateProject(string name, ICollection<Qualification> qualifications, ProjectSize size ,Company company)
         {
             if (qualifications == null || qualifications.Count == 0 || string.IsNullOrWhiteSpace(name))
@@ -24,24 +67,14 @@ namespace CompanyManager.Services
             }
 
             var project = new Project(name, qualifications, size, company);
+            _context.Projects.Add(project); // You need to add the project to your DbContext
 
-            _context.Projects.Add(project);
+            
             _context.SaveChanges();
+            Logger.LogInformation($"Project {project.Name} was created");   
 
             return project;
         }
-
-        public IEnumerable<Qualification> GetQualifications(Project project)
-        {
-            var qualifications = _context.Projects
-                .Include(p => p.Qualifications)
-                .Where(p => p.Id == project.Id)
-                .SelectMany(p => p.Qualifications)
-                .ToList();
-
-            return qualifications;
-        }
-
         public bool IsWorkerAssignedToProject(Worker worker, Project project)
         {
             return worker.WorkerProjects.Any(wp => wp.Project == project);
@@ -68,6 +101,7 @@ namespace CompanyManager.Services
         
         }
             _context.SaveChanges();
+            Logger.LogInformation($"Worker {worker.Name} was added to project {project.Name}");
             return (true, string.Empty);
         }
 
@@ -87,6 +121,7 @@ namespace CompanyManager.Services
                 }
             }
             _context.SaveChanges();
+            Logger.LogInformation($"Worker {worker.Name} was removed from project {project.Name}");
             return (true, string.Empty);
         }
 
@@ -119,6 +154,7 @@ namespace CompanyManager.Services
                 }
             }
             _context.SaveChanges();
+            Logger.LogInformation($"Qualification {qualification.Name} was added to project {project.Name}");
             return (true, string.Empty);
         }
 
@@ -160,12 +196,54 @@ namespace CompanyManager.Services
                 {
                     if (project.MissingQualifications.Contains(missingQualification))
                     {
+                        Logger.LogInformation($"Worker is helpful with qualification {missingQualification.Name} for project {project.Name}");
                         return true;
                     }
                 }
             }
-
+            Logger.LogInformation($"Worker is not helpful for project {project.Name}");
             return false;
+        }
+        public IActionResult UnassignWorkerFromProject(Project projectToUnassignFrom, Worker workerToUnassign)
+        {
+            if (projectToUnassignFrom == null || workerToUnassign == null)
+            {
+                _logger.LogInformation($"Project {projectToUnassignFrom?.Name} or worker {workerToUnassign?.Name} not found.");
+                return new NotFoundObjectResult("Project or worker not found.");
+            }
+
+            var workersProject = _workerService.GetWorkersProject(workerToUnassign, projectToUnassignFrom);
+
+            if (workersProject == null)
+            {
+                _logger.LogInformation($"Worker {workerToUnassign.Name} is not assigned to project {projectToUnassignFrom.Name}.");
+                return new NotFoundObjectResult("Worker not assigned to project.");
+            }
+
+            foreach (var qualification in workerToUnassign.Qualifications)
+            {
+                // Check if the qualification is already present in project's qualifications
+                var projectQualification = projectToUnassignFrom.Qualifications.FirstOrDefault(q => q.Id == qualification.Id);
+                if (projectQualification != null)
+                {
+                    // Check if any remaining assigned workers satisfy the qualification
+                    bool isQualificationSatisfied = projectToUnassignFrom.WorkerProjects
+                        .Where(wp => wp.WorkerId != workerToUnassign.Id)
+                        .Any(wp => wp.Worker.Qualifications.Any(q => q.Id == qualification.Id));
+
+                    if (!isQualificationSatisfied)
+                    {
+                        // Add the missing qualification if none of the remaining assigned workers satisfy it
+                        _logger.LogInformation($"Adding missing qualification {qualification.Name} to project {projectToUnassignFrom.Name} because worker {workerToUnassign.Name} was unassigned.");
+                        projectToUnassignFrom.MissingQualifications.Add(new MissingQualification(projectToUnassignFrom, qualification, qualification.Name));
+                    }
+                }
+            }
+
+            _context.WorkerProject.Remove(workersProject);
+            _context.SaveChanges();
+
+            return new OkResult();
         }
     }
 }

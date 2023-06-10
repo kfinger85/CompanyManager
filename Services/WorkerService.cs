@@ -1,5 +1,7 @@
 #nullable enable
 
+using Microsoft.EntityFrameworkCore;
+
 using CompanyManager.Models;
 using CompanyManager.Logging;
 
@@ -31,9 +33,21 @@ namespace CompanyManager.Services
         }
         public Worker? GetWorkerByName(string name)
         {
-            return _context.Workers.FirstOrDefault(w => w.Name == name);        
-            
+            return _context.Workers
+                .Include(w => w.Company)
+                .Include(w => w.Qualifications)
+                .Include(w => w.WorkerProjects)
+                    .ThenInclude(wp => wp.Project)
+                .FirstOrDefault(w => w.Name == name);
         }
+
+        public WorkerProject? GetWorkersProject(Worker worker, Project project)
+        {
+            //            var workerProject = _context.WorkerProject
+            //    .FirstOrDefault(wp => wp.WorkerId == projectToUnassign.Id && wp.ProjectId == workerToUnassign.Id);
+            return _context.WorkerProject.FirstOrDefault(wp => wp.Worker == worker && wp.Project == project);
+        }
+
 
 
         /// <summary>
