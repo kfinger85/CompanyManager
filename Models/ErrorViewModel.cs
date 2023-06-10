@@ -1,3 +1,4 @@
+#nullable enable
 namespace CompanyManager.Models;
 
 public class ErrorViewModel
