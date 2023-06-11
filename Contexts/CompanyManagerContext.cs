@@ -4,7 +4,6 @@ using CompanyManager.Models;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 public class CompanyManagerContext : DbContext
 {
@@ -17,7 +16,10 @@ public class CompanyManagerContext : DbContext
 
     public DbSet<MissingQualification> MissingQualifications { get; set; }
 
-    public CompanyManagerContext(DbContextOptions<CompanyManagerContext> options) : base(options)
+    public DbSet<IdentityUser> Users { get; set; }
+
+
+    public CompanyManagerContext(DbContextOptions<CompanyManagerContext> options)  : base(options)
     {
 
         this.Database.EnsureCreated();  // create the database
@@ -39,24 +41,18 @@ public class CompanyManagerContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
 
-                base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<IdentityUserLogin<string>>(entity =>
         {
             entity.HasKey(e => new { e.LoginProvider, e.ProviderKey });
         });
-
-
-    modelBuilder.Entity<ApplicationUser>()
-        .HasKey(l => l.Id);
+   
         
         modelBuilder.Entity<ApplicationUser>()
             .Property(u => u.AccessFailedCount)
             .IsRequired();
 
-    // Configure other properties as needed
-
-    // Configure relationships
         modelBuilder.Entity<ApplicationUser>()
             .HasMany(u => u.Claims)
             .WithOne()
@@ -111,14 +107,6 @@ public class CompanyManagerContext : DbContext
             .HasMany(c => c.Workers)
             .WithOne(w => w.Company); 
 
-        // A Company has many Qualifications and a Qualification can be associated with many Companies. 
-        // The relationship is managed through a joining table "CompanyQualification".
-        /*
-        modelBuilder.Entity<Company>()
-            .HasMany(c => c.Qualifications)
-            .WithMany(q => q.Companies)
-            .UsingEntity(j => j.ToTable("CompanyQualification"));
-          */  
         // A Company has many Projects. Each Project is associated with one Company.
         modelBuilder.Entity<Company>()
             .HasMany(c => c.Projects)
@@ -128,18 +116,7 @@ public class CompanyManagerContext : DbContext
         // The relationship is managed through a joining table "WorkerProject".
             modelBuilder.Entity<WorkerProject>()
                 .HasKey(wp => new { wp.WorkerId, wp.ProjectId });
-/*
-            modelBuilder.Entity<WorkerProject>()
-                .HasOne(wp => wp.Worker)
-                .WithMany(w => w.WorkerProjects)
-                .HasForeignKey(wp => wp.WorkerId)
-                .HasForeignKey(wp => wp.ProjectId);
-                /*
-            modelBuilder.Entity<WorkerProject>()
-                .HasOne(wp => wp.Project)
-                .WithMany(p => p.WorkerProjects)
-                .HasForeignKey(wp => wp.ProjectId);
-                */
+
         // A Worker can have many Qualifications and a Qualification can be possessed by many Workers.
         // The relationship is managed through a joining table "WorkerQualification".
         modelBuilder.Entity<Worker>()
@@ -161,14 +138,5 @@ public class CompanyManagerContext : DbContext
             .WithMany(c => c.Projects)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // A Qualification can be associated with many Companies and a Company can require many Qualifications.
-        // The relationship is managed through a joining table "CompanyQualification".
-        /*
-        modelBuilder.Entity<Qualification>()
-            .HasMany(q => q.Companies)
-            .WithMany(c => c.Qualifications)
-            .UsingEntity(j => j.ToTable("CompanyQualification"));
-            }
-            */
     }
 }
