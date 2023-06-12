@@ -79,7 +79,7 @@ namespace CompanyManager.Models
                 throw new ArgumentException("Salary must be greater than or equal to 0");
             }
 
-            Worker newWorker = new Worker(name, qualifications, salary, this, username, password);
+            Worker newWorker = new Worker(name, qualifications, salary, this, username);
 
             ICollection<Qualification> toRemove = new List<Qualification>();
             ICollection<Qualification> toAdd = new List<Qualification>();
