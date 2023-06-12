@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using CompanyManager.Repositories;
 using CompanyManager.Services;
 using CompanyManager.Middleware;
-using CompanyManager.Models; 
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -15,6 +14,7 @@ using Serilog;
 
 
 using CompanyManager.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CompanyManager
 {
@@ -28,6 +28,12 @@ namespace CompanyManager
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        /// <seealso>
+        ///In ASP.NET Core, the AddScoped method is an extension method provided by the Microsoft.Extensions.DependencyInjection namespace 
+        ///and is used to register a service with a scoped lifetime in the dependency injection container.
+        ///  Dependency Inversion Principle, one of the key principles of SOLID. This approach makes it easier to swap out the EmailService for another implementation in the future if required, 
+        /// without changing the rest of your code that depends on the service.
+        /// </seealso>
         public void ConfigureServices(IServiceCollection services)
         {
 
@@ -45,17 +51,33 @@ namespace CompanyManager
             services.AddScoped<IWorkerRepository, WorkerRepository>();
             services.AddScoped<IProjectRepository, ProjectRepository>(); 
 
-            services.AddScoped<WorkerService, WorkerService>();
             services.AddScoped<ILogger<ProjectService>, Logger<ProjectService>>();
-            services.AddScoped<ProjectService, ProjectService>();
-            services.AddScoped<CompanyService, CompanyService>();
-            services.AddScoped<QualificationService, QualificationService>();
+
+            services.AddScoped<IWorkerService, WorkerService>();
+            services.AddScoped<IProjectService, ProjectService>();
+            services.AddScoped<ICompanyService, CompanyService>();
+            services.AddScoped<IQualificationService, QualificationService>();
+
 
             services.AddScoped<CompanyInitializer, CompanyInitializer>();
 
-             services.AddIdentity<ApplicationUser, IdentityRole>()
-        .AddEntityFrameworkStores<CompanyManagerContext>()
-        .AddDefaultTokenProviders();
+        /*
+        This method sets up the ASP.NET Identity system with the specified user and role types. 
+        In this case, it configures the system to use IdentityUser as the user type and IdentityRole as the role type. 
+        These types are provided by the ASP.NET Identity framework.
+        */
+            services.AddIdentity<IdentityUser, IdentityRole>()
+            //This method configures the storage mechanism for user and role data using Entity Framework. It specifies 
+            // that the CompanyManagerContext class should be used as the database context for storing and retrieving user and role information.
+                    .AddEntityFrameworkStores<CompanyManagerContext>()
+                    .AddDefaultTokenProviders();
+
+
+            services.AddScoped<UserManager<IdentityUser>>();
+
+            services.Configure<EmailOptions>(Configuration.GetSection("EmailOptions"));
+            services.AddScoped<IEmailService, EmailService>(); // Add the email service
+            
 
 
             services.AddScoped<ProjectService>(serviceProvider =>
