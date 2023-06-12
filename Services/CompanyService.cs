@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CompanyManager.Services
 {
-    public class CompanyService
+    public class CompanyService : ICompanyService
     {
         private readonly CompanyManagerContext _context;
 
@@ -138,7 +138,7 @@ namespace CompanyManager.Services
                 throw new ArgumentException("Worker password must not be null or blank");
             }
 
-            Worker worker = new Worker(name, qualifications, salary, _company, username, password);
+            Worker worker = new Worker(name, qualifications, salary, _company, username);
             _context.Workers.Add(worker);
             _context.SaveChanges();
             Logger.LogInformation($"Created worker with name {name}");

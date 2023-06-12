@@ -3,7 +3,7 @@ using CompanyManager.Logging;
 
 namespace CompanyManager.Services
 {
-    public class QualificationService
+    public class QualificationService : IQualificationService
     {
         private readonly CompanyManagerContext _context;
 

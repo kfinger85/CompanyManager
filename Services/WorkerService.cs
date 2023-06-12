@@ -7,7 +7,7 @@ using CompanyManager.Logging;
 
 namespace CompanyManager.Services
 {
-    public class WorkerService
+    public class WorkerService : IWorkerService
     {
         private readonly CompanyManagerContext _context;
 
@@ -84,7 +84,7 @@ namespace CompanyManager.Services
             }
         
 
-            var worker = new Worker(name, qualifications, salary, company, username, password);
+            var worker = new Worker(name, qualifications, salary, company, username);
 
 
             _context.Workers.Add(worker);
@@ -166,7 +166,7 @@ namespace CompanyManager.Services
                 return (false, "Username must not be null or empty");
             }
 
-            worker.Username = username;
+            worker.UserName = username;
             _context.SaveChanges();
 
             return (true, string.Empty);
@@ -175,8 +175,10 @@ namespace CompanyManager.Services
         /// <summary>
         /// Sets a new password for a specific Worker and saves the changes to the database.
         /// </summary>
+        // TODO
         public (bool, string) SetPassword(Worker worker, string password)
         {
+            /*
             if (string.IsNullOrWhiteSpace(password))
             {
                 return (false, "Password must not be null or empty");
@@ -186,6 +188,8 @@ namespace CompanyManager.Services
             _context.SaveChanges();
 
             return (true, string.Empty);
+            */
+            throw new NotImplementedException();
         }
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CompanyManager.Services
 {
-    public class ProjectService
+    public class ProjectService : IProjectService
     {
         private readonly CompanyManagerContext _context;
         private readonly WorkerService _workerService;
@@ -228,7 +228,7 @@ namespace CompanyManager.Services
                 {
                     // Check if any remaining assigned workers satisfy the qualification
                     bool isQualificationSatisfied = projectToUnassignFrom.WorkerProjects
-                        .Where(wp => wp.WorkerId != workerToUnassign.Id)
+                        .Where(wp => wp.WorkerId.Equals(workerToUnassign.Id))
                         .Any(wp => wp.Worker.Qualifications.Any(q => q.Id == qualification.Id));
 
                     if (!isQualificationSatisfied)
