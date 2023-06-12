@@ -5,3 +5,5 @@ obj/
 ClientApp/node_modules/
 /.csproj.user
 /*.log
+appsettings.json
+.vscode/settings.json
