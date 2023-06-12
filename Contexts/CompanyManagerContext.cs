@@ -53,6 +53,11 @@ public class CompanyManagerContext : DbContext
             .Property(u => u.AccessFailedCount)
             .IsRequired();
 
+            modelBuilder.Entity<ApplicationUser>()
+                .HasDiscriminator<string>("UserType")
+                .HasValue<ApplicationUser>("ApplicationUser")
+                .HasValue<Worker>("Worker");
+
         modelBuilder.Entity<ApplicationUser>()
             .HasMany(u => u.Claims)
             .WithOne()
