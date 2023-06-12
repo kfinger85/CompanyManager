@@ -7,7 +7,7 @@ namespace CompanyManager.Models
     public class WorkerProject
     {
 
-        public long WorkerId { get; set; }
+        public string WorkerId { get; set; }
         public virtual Worker Worker { get; set; }
         public long ProjectId { get; set; }
         public virtual Project Project { get; set; }
