@@ -22,16 +22,15 @@ namespace CompanyManager.Controllers
         public IActionResult Index()
         {
             try{
-            var workers = _context.Workers
-                .Select(w => new {
+            var workers = _context.Users.OfType<Worker>()
+                 .Select(w => new {
                     w.Name,
                     w.Salary,
-                    w.Username,
-                    w.Password,
+                    Username = w.UserName,
                     CompanyName = w.Company.Name,
                     Qualifications = w.Qualifications.Select(q => q.Name),
                     Projects = _context.WorkerProject
-                        .Where(wp => wp.WorkerId == w.Id)
+                        .Where(wp => wp.WorkerId.Equals(w.Id))
                         .Select(wp => wp.Project.Name).ToList()
                 })
                 .ToList();
@@ -50,12 +49,11 @@ public IActionResult Details(string name)
         .Select(w => new {
             w.Name,
             w.Salary,
-            w.Username,
-            w.Password,
+            Username = w.UserName,
             CompanyName = w.Company.Name,
             Qualifications = w.Qualifications.Select(q => q.Name),
             Projects = _context.WorkerProject
-                .Where(wp => wp.WorkerId == w.Id)
+                .Where(wp => wp.WorkerId.Equals(w.Id))
                 .Select(wp => wp.Project.Name)
                 .ToList()
         })

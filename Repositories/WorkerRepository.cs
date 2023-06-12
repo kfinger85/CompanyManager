@@ -22,7 +22,7 @@ namespace CompanyManager.Repositories{
 
         public Worker GetById(long id)
         {
-            return _context.Workers.FirstOrDefault(w => w.Id == id);
+            return _context.Workers.FirstOrDefault(w => w.Id.Equals(id));
         }
 
 
