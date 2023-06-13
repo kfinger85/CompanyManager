@@ -17,12 +17,8 @@ namespace CompanyManager
         private readonly ProjectService _projectService;
         private readonly WorkerService _workerService;
 
-        public CompanyInitializer(
-            CompanyManagerContext context, 
-            CompanyService companyService, 
-            QualificationService qualificationService,
-            ProjectService projectService,
-            WorkerService workerService)
+        public CompanyInitializer(CompanyManagerContext context, CompanyService companyService, QualificationService qualificationService,
+                                        ProjectService projectService, WorkerService workerService)
         {
             _context = context;
             _companyService = companyService;
