@@ -1,6 +1,6 @@
 ## Entities
 
-You have five entities (Company, Worker, Project, Qualification, WorkerProject), so you would have five entity classes. This is correct.
+You have five entities (Company, Worker, Project, Qualification, WorkerProject), so you would have five entity classes.
 
 ## Repositories
 
