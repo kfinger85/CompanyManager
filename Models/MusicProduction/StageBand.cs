@@ -1,10 +1,10 @@
 namespace CompanyManager.Models
 {
-    public class StageBand
+    public class StageArtist
     {
         public int StageId { get; set; }
         public Stage Stage { get; set; }
-        public int BandId { get; set; }
-        public Band Band { get; set; }
+        public int ArtistId { get; set; }
+        public Artist Artist { get; set; }
     }
 }
