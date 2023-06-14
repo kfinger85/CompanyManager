@@ -29,9 +29,13 @@ public class CompanyManagerContext : DbContext
     public DbSet<ProductCategory> ProductCategory { get; set; }
 
 
+
+
+
     public CompanyManagerContext(DbContextOptions<CompanyManagerContext> options)  : base(options)
     {
 
+        
         this.Database.EnsureCreated();  // create the database
     }
 
@@ -153,5 +157,38 @@ public class CompanyManagerContext : DbContext
             .WithMany(c => c.Projects)
             .OnDelete(DeleteBehavior.Cascade);
 
+
+// For the relationship between ProductCategory and its SubCategories
+modelBuilder.Entity<ProductCategory>()
+    .HasMany(p => p.SubCategories)
+    .WithOne(c => c.ParentProductCategory)
+    .HasForeignKey(c => c.ParentProductCategoryId);
+
+// For the relationship between Product and its Parent ProductCategory
+modelBuilder.Entity<Product>()
+    .HasOne(p => p.ParentProductCategory)
+    .WithMany(c => c.Products)
+    .HasForeignKey(p => p.ParentProductCategoryId);
+
+// For the relationship between Product and its Sub ProductCategory
+modelBuilder.Entity<Product>()
+    .HasOne(p => p.SubProductCategory)
+    .WithMany(c => c.SubCategoryProducts)  // Use the new property
+    .HasForeignKey(p => p.SubProductCategoryId);
+            
+        modelBuilder.Entity<ProductCategory>().HasData(
+        new ProductCategory { ProductCategoryId = 1, Name = "Guitars" },
+        new ProductCategory { ProductCategoryId = 2, Name = "GuitarsAmps" },
+        new ProductCategory { ProductCategoryId = 3, Name = "Keyboards" },
+        new ProductCategory { ProductCategoryId = 4, Name = "BassCabs" },
+        new ProductCategory { ProductCategoryId = 5, Name = "BassAmps" },
+        new ProductCategory { ProductCategoryId = 6, Name = "Drums" },
+        new ProductCategory { ProductCategoryId = 7, Name = "Percussion" },
+        new ProductCategory { ProductCategoryId = 8, Name = "Drum Hardware" , ParentProductCategoryId = 6 },
+        new ProductCategory { ProductCategoryId = 9, Name = "Snare Drum ", ParentProductCategoryId = 6    },
+        new ProductCategory { ProductCategoryId = 10, Name = "Kick Drum" , ParentProductCategoryId = 6    },
+        new ProductCategory { ProductCategoryId = 11, Name = "Tom Drum"  , ParentProductCategoryId = 6    },
+        new ProductCategory { ProductCategoryId = 12, Name = "Cymbals"   , ParentProductCategoryId = 6    }
+    );
     }
 }
