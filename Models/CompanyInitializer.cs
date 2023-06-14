@@ -44,6 +44,7 @@ namespace CompanyManager
     
           
                     ExecuteInTransaction(CreateOneWorker);
+                    ExecuteInTransaction(CreateOneProduct);
                     
                     /*
                     ExecuteInTransaction(CreateCompany);
@@ -71,7 +72,13 @@ namespace CompanyManager
         }
         private void CreateOneProduct()
         {
-
+            /*
+                    public async Task<Product> CreateProduct(string make, string model, string? serialNumber, ProductCategory productCategory, 
+                                                            string? description, decimal price, int stock, ProductCategories? subCategory, 
+                                                            ICollection<StageProduct>? stageProducts)
+            */
+            _productService.CreateProduct("Fender", "Stratocaster", "123456789", "Guitars" , "A guitar", 1000, 10, null);
+            _productService.CreateProduct("Tama", "Starclassic Kick Drum", "123456789", "Drums" , "A drum kit", 1000, 10, "KickDrums");
         }
         private void CreateOneWorker()
         {
