@@ -53,11 +53,16 @@ namespace CompanyManager
 
             services.AddScoped<ILogger<ProjectService>, Logger<ProjectService>>();
 
-            services.AddScoped<IWorkerService, WorkerService>();
-            services.AddScoped<IProjectService, ProjectService>();
-            services.AddScoped<ICompanyService, CompanyService>();
-            services.AddScoped<IQualificationService, QualificationService>();
+/*
+The interfaces (IWorkerService, IProjectService, ICompanyService, IQualificationService) will be resolved automatically by the 
+dependency injection container based on their corresponding implementations 
+(WorkerService, ProjectService, CompanyService, QualificationService) registered above.
+*/
 
+            services.AddScoped<WorkerService>();
+            services.AddScoped<ProjectService>();   
+            services.AddScoped<CompanyService>();
+            services.AddScoped<QualificationService>();
 
             services.AddScoped<CompanyInitializer, CompanyInitializer>();
 
