@@ -1,6 +1,6 @@
-namespace CompanyManager.Models
+namespace MusicProduction.Models
 {
-    public enum  ProductSubcategory
+    public enum  ProductCategories
     {
     GuitarsAmps,
     Keyboards,

@@ -1,4 +1,4 @@
-namespace CompanyManager.Models
+namespace MusicProduction.Models
 {
     public class Artist
     {
