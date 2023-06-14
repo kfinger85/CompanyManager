@@ -1,5 +1,9 @@
 using CompanyManager.Models;
 using CompanyManager.Services;
+
+using MusicProduction.Models;
+using MusicProduction.Services;
+
 using CompanyManager.Logging;
 using Bogus;
 using Microsoft.EntityFrameworkCore;
@@ -17,14 +21,22 @@ namespace CompanyManager
         private readonly ProjectService _projectService;
         private readonly WorkerService _workerService;
 
-        public CompanyInitializer(CompanyManagerContext context, CompanyService companyService, QualificationService qualificationService,
-                                        ProjectService projectService, WorkerService workerService)
+        private readonly IProductService _productService;
+
+        
+
+        public CompanyInitializer(CompanyManagerContext context, CompanyService companyService, 
+                                QualificationService qualificationService,
+                                ProjectService projectService, WorkerService workerService,
+                                IProductService productService
+                                )
         {
             _context = context;
             _companyService = companyService;
             _qualificationService = qualificationService;
             _projectService = projectService;
             _workerService = workerService;
+            _productService = productService;
         }
 
         public void Initialize()
@@ -57,7 +69,10 @@ namespace CompanyManager
                         }
                     }
         }
+        private void CreateOneProduct()
+        {
 
+        }
         private void CreateOneWorker()
         {
             var faker = new Bogus.Faker();
@@ -92,6 +107,21 @@ namespace CompanyManager
                     throw; // Re-throw the exception to propagate it further
                 }
             }
+        }
+        private void CreateProduct()
+        {
+            /*
+            var faker = new Bogus.Faker();
+            var productCategories = _productCategoryService.GetProductCategories();
+            var subCategories = _productCategoryService.GetSubCategories();
+
+            // Get a random product category
+            var randomProductCategory = productCategories.OrderBy(q => faker.Random.Int()).First();
+            // Get a random sub category
+            var randomSubCategory = subCategories.OrderBy(q => faker.Random.Int()).First();
+
+            _productService.CreateProduct(faker.Commerce.ProductName(), faker.Commerce.ProductDescription(), faker.Commerce.Product(), faker.Commerce.ProductAdjective(), faker.Random.Decimal(0, 1000), faker.Random.Int(0, 100), randomProductCategory.Id, randomProductCategory, randomSubCategory, null);
+        */
         }
 
         private void CreateCompany()
