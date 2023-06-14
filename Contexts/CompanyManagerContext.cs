@@ -2,6 +2,8 @@
 
 using CompanyManager.Models;
 
+using MusicProduction.Models;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 
@@ -19,10 +21,12 @@ public class CompanyManagerContext : DbContext
     public DbSet<IdentityUser> Users { get; set; }
 
     // Music Production related entities
-    public DbSet<Artist> Artists { get; set; }
-    public DbSet<Stage> Stages { get; set; }
-    public DbSet<StageArtist> StageArtists { get; set; }
+
+    // public DbSet<Artist> Artists { get; set; }
+    // public DbSet<Stage> Stages { get; set; }
+    // public DbSet<StageArtist> StageArtists { get; set; }
     public DbSet<Product> Product { get; set; }
+    public DbSet<ProductCategory> ProductCategory { get; set; }
 
 
     public CompanyManagerContext(DbContextOptions<CompanyManagerContext> options)  : base(options)
