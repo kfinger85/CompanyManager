@@ -51,24 +51,5 @@ namespace MusicProduction.Repositories
         {
             return _context.Product.ToListAsync();
         }
-        public void CreateProduct(string make, string model, string serialNumber, 
-        string description, decimal price, int stock, int productCategoryId, 
-        ProductCategory productCategory, 
-        ProductCategories subCategory, 
-        ICollection<StageProduct> stageProducts)
-        {
-            Product product = new Product();
-            product.Make = make;
-            product.Model = model;
-            product.SerialNumber = serialNumber;
-            product.Description = description;
-            product.Price = price;
-            product.Stock = stock;
-            product.ProductCategoryId = productCategoryId;
-            product.ProductCategory = productCategory;
-            product.SubCategory = subCategory;
-            product.StageProducts = stageProducts;
-        }
-
     }
 }
