@@ -15,6 +15,9 @@ using Serilog;
 
 using CompanyManager.Logging;
 using Microsoft.Extensions.Options;
+using MusicProduction.Services;
+using MusicProduction.Repositories;
+using MusicProduction.Models;
 
 namespace CompanyManager
 {
@@ -53,16 +56,24 @@ namespace CompanyManager
 
             services.AddScoped<ILogger<ProjectService>, Logger<ProjectService>>();
 
-/*
-The interfaces (IWorkerService, IProjectService, ICompanyService, IQualificationService) will be resolved automatically by the 
-dependency injection container based on their corresponding implementations 
-(WorkerService, ProjectService, CompanyService, QualificationService) registered above.
-*/
-
+            /*
+            The interfaces (IWorkerService, IProjectService, ICompanyService, IQualificationService) will be resolved automatically by the 
+            dependency injection container based on their corresponding implementations 
+            (WorkerService, ProjectService, CompanyService, QualificationService) registered above.
+            */
             services.AddScoped<WorkerService>();
             services.AddScoped<ProjectService>();   
             services.AddScoped<CompanyService>();
             services.AddScoped<QualificationService>();
+
+            /*
+            By keeping only these registrations, the dependency injection container will correctly resolve the IProductService interface to the 
+            ProductService class and the IProductRepository interface to the ProductRepository class when needed.
+            */
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IProductService, ProductService>();
+
+
 
             services.AddScoped<CompanyInitializer, CompanyInitializer>();
 
