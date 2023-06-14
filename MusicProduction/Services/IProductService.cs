@@ -10,9 +10,8 @@ namespace MusicProduction.Services
     {
         Task<List<Product>> GetProducts();
         Task<Product> GetProductById(int id);
-        Task<Product> CreateProduct(string make, string model, string? serialNumber, ProductCategory productCategory, 
-                                                            string? description, decimal price, int stock, ProductCategories? subCategory, 
-                                                            ICollection<StageProduct>? stageProducts);
+        Task<Product> CreateProduct(string make, string model, string? serialNumber, string categoryName, 
+                                        string? description, decimal price, int stock, string? subCategoryName);
         Task<Product> UpdateProduct(Product product);
         Task DeleteProduct(int id);
     }
