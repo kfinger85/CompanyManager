@@ -72,6 +72,7 @@ namespace CompanyManager
             */
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IProductCategoryService, ProductCategoryService>();
 
 
 
