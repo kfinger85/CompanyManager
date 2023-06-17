@@ -21,27 +21,29 @@ namespace CompanyManager.Services
 
         }
 
-        public async Task<List<Product>> GetProducts()
+        public List<Product> GetProducts()
         {
-            return await _productRepository.GetProducts();
+            return  _productRepository.GetProducts();
         }
 
-        public async Task<Product> GetProductById(int id)
+        public  Product GetProductById(int id)
         {
-            return await _productRepository.GetProductById(id);
+            return  _productRepository.GetProductById(id);
         }
 
-public async Task<Product> CreateProduct(string make, string model, string? serialNumber, string categoryName, 
+
+
+public  Product CreateProduct(string make, string model, string? serialNumber, string categoryName, 
                                         string? description, decimal price, int stock, string? subCategoryName)
 {
 
-    ProductCategory category = await _productCategoryService.GetByNameAsync(categoryName);
+    ProductCategory category =  _productCategoryService.GetByName(categoryName);
     if(category == null){
         Logger.LogInformation($"Product category with name {categoryName} does not exist.");
         throw new Exception($"Product category with name {categoryName} does not exist."); 
         }
 
-    ProductCategory subCategory = subCategoryName != null ? await _productCategoryService.GetByNameAsync(subCategoryName) : null;
+    ProductCategory subCategory = subCategoryName != null ?  _productCategoryService.GetByName(subCategoryName) : null;
 
     Product product = new Product
     {
@@ -55,18 +57,18 @@ public async Task<Product> CreateProduct(string make, string model, string? seri
         SubProductCategoryId = subCategory?.ProductCategoryId,  // it will be null if subCategory is null
     };
 
-    return await _productRepository.CreateProduct(product);      
+    return  _productRepository.CreateProduct(product);      
 }
 
 
-        public async Task<Product> UpdateProduct(Product product)
+        public Product UpdateProduct(Product product)
         {
-            return await _productRepository.UpdateProduct(product);
+            return  _productRepository.UpdateProduct(product);
         }
 
-        public async Task DeleteProduct(int id)
+        public void DeleteProduct(int id)
         {
-            await _productRepository.DeleteProduct(id);
+             _productRepository.DeleteProduct(id);
         }
 
 

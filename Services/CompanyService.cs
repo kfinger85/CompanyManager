@@ -43,7 +43,7 @@ namespace CompanyManager.Services
 
             _company = new Company(name);
             _context.Companies.Add(_company);
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
 
             Logger.LogInformation($"Created company with name {name}");
 
@@ -55,7 +55,7 @@ namespace CompanyManager.Services
         {
             // Update the company in the context and save changes
             _context.Companies.Update(company);
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
         }
 
 
@@ -97,7 +97,7 @@ namespace CompanyManager.Services
 
                 Project project = new Project(name, qualifications, size, _company);
                 _context.Projects.Add(project);
-                _context.SaveChanges();
+                _context.SaveChangesAsync();
                 return (true, "Project created successfully");
             }
             catch (Exception ex)
@@ -140,7 +140,7 @@ namespace CompanyManager.Services
 
             Worker worker = new Worker(name, qualifications, salary, _company, username);
             _context.Workers.Add(worker);
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
             Logger.LogInformation($"Created worker with name {name}");
 
             return worker;
@@ -203,7 +203,7 @@ namespace CompanyManager.Services
             WorkerProject workerProject = new WorkerProject(worker, project);
             worker.WorkerProjects.Add(workerProject);
             _context.WorkerProject.Add(workerProject); // Add WorkerProject to the context
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
             Logger.LogInformation($"Assigned worker {worker.Name} to project {project.Name}");
             return true;
         }
@@ -254,7 +254,7 @@ namespace CompanyManager.Services
             
             worker.WorkerProjects.Remove(workerProject);
             _context.WorkerProject.Remove(workerProject); // Remove WorkerProject from the context
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
             Logger.LogInformation($"Unassigned worker {worker.Name} from project {project.Name}");
             return true;
         }

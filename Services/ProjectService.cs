@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using CompanyManager.Models;
 using CompanyManager.Logging;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace CompanyManager.Services
 {
@@ -61,19 +62,26 @@ namespace CompanyManager.Services
         }
         public Project CreateProject(string name, ICollection<Qualification> qualifications, ProjectSize size ,Company company)
         {
-            if (qualifications == null || qualifications.Count == 0 || string.IsNullOrWhiteSpace(name))
+            try
             {
-                throw new ArgumentException("Invalid arguments");
+                if (qualifications == null || qualifications.Count == 0 || string.IsNullOrWhiteSpace(name))
+                {
+                    throw new ArgumentException("Invalid arguments");
+                }
+
+                var project = new Project(name, qualifications, size, company);
+                _context.Projects.Add(project); // You need to add the project to your DbContext
+
+                _context.SaveChanges();
+                Logger.LogInformation($"Project {project.Name} was created");   
+
+                return project;
             }
-
-            var project = new Project(name, qualifications, size, company);
-            _context.Projects.Add(project); // You need to add the project to your DbContext
-
-            
-            _context.SaveChanges();
-            Logger.LogInformation($"Project {project.Name} was created");   
-
-            return project;
+            catch(Exception e)
+            {
+                Logger.LogError(e.Message);
+                return null;
+            }
         }
         public bool IsWorkerAssignedToProject(Worker worker, Project project)
         {

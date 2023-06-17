@@ -6,7 +6,10 @@ namespace MusicProduction.Services
 {
     // Other methods...
     
-    Task<ProductCategory> GetByNameAsync(string name);
-    Task<ProductCategory> GetByIdAsync(int id);
+    ProductCategory GetByNameAsync(string name);
+    ProductCategory GetByIdAsync(int id);
+
+    ProductCategory GetByName(string categoryName);
+
 }
 }

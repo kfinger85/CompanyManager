@@ -12,7 +12,7 @@ namespace CompanyManager.Services
 
         Project GetProjectByName(string name);
 
-        Project CreateProject(string name, ICollection<Qualification> qualifications, ProjectSize size, Company company);
+        Project CreateProject(string name, ICollection<Qualification> qualifications, ProjectSize size ,Company company);
 
         bool IsWorkerAssignedToProject(Worker worker, Project project);
 

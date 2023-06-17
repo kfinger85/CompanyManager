@@ -8,11 +8,11 @@ namespace MusicProduction.Services
 {
     public interface IProductService
     {
-        Task<List<Product>> GetProducts();
-        Task<Product> GetProductById(int id);
-        Task<Product> CreateProduct(string make, string model, string? serialNumber, string categoryName, 
+        List<Product> GetProducts();
+        Product GetProductById(int id);
+        Product CreateProduct(string make, string model, string? serialNumber, string categoryName, 
                                         string? description, decimal price, int stock, string? subCategoryName);
-        Task<Product> UpdateProduct(Product product);
-        Task DeleteProduct(int id);
+        Product UpdateProduct(Product product);
+        void DeleteProduct(int id);
     }
 }

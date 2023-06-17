@@ -1,5 +1,4 @@
 using MusicProduction.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace MusicProduction.Services
 {
@@ -12,16 +11,33 @@ namespace MusicProduction.Services
             _context = context;
         }
 
-        public async Task<ProductCategory> GetByNameAsync(string name)
+        public ProductCategory GetByNameAsync(string name)
         {
-            return await _context.ProductCategory
-                .SingleOrDefaultAsync(pc => pc.Name == name);
+            return  _context.ProductCategory
+                .SingleOrDefault(pc => pc.Name == name);
         }
 
-        public async Task<ProductCategory> GetByIdAsync(int id)
+        public ProductCategory GetByIdAsync(int id)
         {
-            return await _context.ProductCategory
-                .SingleOrDefaultAsync(pc => pc.ProductCategoryId == id);
+            var productCategory = _context.ProductCategory
+            .SingleOrDefault(pc => pc.ProductCategoryId == id);
+            if (productCategory == null)
+            {
+                throw new Exception($"{id} category not found");
+            }
+            return productCategory;
+        }
+
+        public ProductCategory GetByName(string categoryName)
+        {
+            string name = categoryName.Trim().ToLower(); 
+            var productCategory = _context.ProductCategory
+                .SingleOrDefault(pc => pc.Name.Trim().ToLower() == name);
+                if (productCategory == null)
+                {
+                    throw new Exception($"{categoryName} category not found");
+                }
+            return productCategory;
         }
     }
 }

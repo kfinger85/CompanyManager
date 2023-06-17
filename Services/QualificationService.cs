@@ -12,10 +12,16 @@ namespace CompanyManager.Services
             _context = context;
         }
         #nullable enable
-        public Qualification? GetByName(string name)
+        public Qualification GetByName(string name)
         {
             Logger.LogInformation($"Getting qualification by name: {name}");
-            return _context.Qualifications.Find(name);
+            var q = _context.Qualifications.Find(name);
+            if (q == null)
+            {
+                Logger.LogWarning($"Qualification with name {name} does not exist");
+                throw new ArgumentException($"Qualification with name {name} does not exist");
+            }
+            return q;
         }
 
         public ICollection<Qualification> GetQualifications()
@@ -39,7 +45,7 @@ namespace CompanyManager.Services
             if (existingQualification != null)
             {
                 Logger.LogInformation($"Qualification with description {description} already exists");
-                return existingQualification;
+                return  existingQualification;
             }
 
             var qualification = new Qualification
