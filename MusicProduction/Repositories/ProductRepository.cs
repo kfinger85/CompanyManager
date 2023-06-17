@@ -13,43 +13,39 @@ namespace MusicProduction.Repositories
             _context = context;
         }
 
-        public async Task<List<Product>> GetProduct()
+        public List<Product> GetProducts()
         {
-            return await _context.Product.ToListAsync();
+            return  _context.Product.ToList();
         }
 
-        public async Task<Product> GetProductById(int id)
+        public Product GetProductById(int id)
         {
-            return await _context.Product.FindAsync(id);
+            return _context.Product.Find(id);
         }
 
-        public async Task<Product> CreateProduct(Product product)
+        public Product CreateProduct(Product product)
         {
             _context.Product.Add(product);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
             return product;
         }
 
-        public async Task<Product> UpdateProduct(Product product)
+        public Product UpdateProduct(Product product)
         {
             _context.Product.Update(product);
-            await _context.SaveChangesAsync();
+            _context.SaveChangesAsync();
             return product;
         }
 
-        public async Task DeleteProduct(int id)
+        public void DeleteProduct(int id)
         {
-            var product = await _context.Product.FindAsync(id);
+            var product = _context.Product.Find(id);
             if (product != null)
             {
                 _context.Product.Remove(product);
-                await _context.SaveChangesAsync();
+                _context.SaveChangesAsync();
             }
         }
 
-        public Task<List<Product>> GetProducts()
-        {
-            return _context.Product.ToListAsync();
-        }
     }
 }
