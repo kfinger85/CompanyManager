@@ -7,6 +7,8 @@ using MusicProduction.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 
+using CompanyManager.Logging;
+
 public class CompanyManagerContext : DbContext
 {
     public DbSet<Company> Companies { get; set; }
@@ -27,16 +29,33 @@ public class CompanyManagerContext : DbContext
     // public DbSet<StageArtist> StageArtists { get; set; }
     public DbSet<Product> Product { get; set; }
     public DbSet<ProductCategory> ProductCategory { get; set; }
+    public DbSet<Order> Orders { get; set; }
+
+    public DbSet<OrderLineItem> OrderLineItems { get; set; }
 
 
 
 
 
-    public CompanyManagerContext(DbContextOptions<CompanyManagerContext> options)  : base(options)
+
+    public CompanyManagerContext(DbContextOptions<CompanyManagerContext> options) : base(options)
+         
     {
 
         
         this.Database.EnsureCreated();  // create the database
+    }
+
+    public override void Dispose()
+    {
+        Logger.LogInformation("CompanyManagerContext disposed.");
+        base.Dispose();
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        Logger.LogInformation("CompanyManagerContext disposed asynchronously.");
+        await base.DisposeAsync();
     }
 
     public CompanyManagerContext()
@@ -158,37 +177,47 @@ public class CompanyManagerContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
 
-// For the relationship between ProductCategory and its SubCategories
-modelBuilder.Entity<ProductCategory>()
-    .HasMany(p => p.SubCategories)
-    .WithOne(c => c.ParentProductCategory)
-    .HasForeignKey(c => c.ParentProductCategoryId);
+    // For the relationship between ProductCategory and its SubCategories
+    modelBuilder.Entity<ProductCategory>()
+        .HasMany(p => p.SubCategories)
+        .WithOne(c => c.ParentProductCategory)
+        .HasForeignKey(c => c.ParentProductCategoryId);
 
-// For the relationship between Product and its Parent ProductCategory
-modelBuilder.Entity<Product>()
-    .HasOne(p => p.ParentProductCategory)
-    .WithMany(c => c.Products)
-    .HasForeignKey(p => p.ParentProductCategoryId);
+    // For the relationship between Product and its Parent ProductCategory
+    modelBuilder.Entity<Product>()
+        .HasOne(p => p.ParentProductCategory)
+        .WithMany(c => c.Products)
+        .HasForeignKey(p => p.ParentProductCategoryId);
 
-// For the relationship between Product and its Sub ProductCategory
-modelBuilder.Entity<Product>()
-    .HasOne(p => p.SubProductCategory)
-    .WithMany(c => c.SubCategoryProducts)  // Use the new property
-    .HasForeignKey(p => p.SubProductCategoryId);
+    // For the relationship between Product and its Sub ProductCategory
+    modelBuilder.Entity<Product>()
+        .HasOne(p => p.SubProductCategory)
+        .WithMany(c => c.SubCategoryProducts)  // Use the new property
+        .HasForeignKey(p => p.SubProductCategoryId);
+
+    modelBuilder.Entity<Order>()
+        .HasMany(o => o.OrderLineItems)
+        .WithOne(oli => oli.Order)
+        .HasForeignKey(oli => oli.OrderId);
+
+    modelBuilder.Entity<OrderLineItem>()
+        .HasOne(oli => oli.Product)
+        .WithMany()  // There's no need for a collection of OrderLineItems in Product
+        .HasForeignKey(oli => oli.ProductId);
             
         modelBuilder.Entity<ProductCategory>().HasData(
-        new ProductCategory { ProductCategoryId = 1, Name = "Guitars" },
-        new ProductCategory { ProductCategoryId = 2, Name = "GuitarsAmps" },
-        new ProductCategory { ProductCategoryId = 3, Name = "Keyboards" },
-        new ProductCategory { ProductCategoryId = 4, Name = "BassCabs" },
-        new ProductCategory { ProductCategoryId = 5, Name = "BassAmps" },
-        new ProductCategory { ProductCategoryId = 6, Name = "Drums" },
-        new ProductCategory { ProductCategoryId = 7, Name = "Percussion" },
-        new ProductCategory { ProductCategoryId = 8, Name = "Drum Hardware" , ParentProductCategoryId = 6 },
-        new ProductCategory { ProductCategoryId = 9, Name = "Snare Drum ", ParentProductCategoryId = 6    },
-        new ProductCategory { ProductCategoryId = 10, Name = "Kick Drum" , ParentProductCategoryId = 6    },
-        new ProductCategory { ProductCategoryId = 11, Name = "Tom Drum"  , ParentProductCategoryId = 6    },
-        new ProductCategory { ProductCategoryId = 12, Name = "Cymbals"   , ParentProductCategoryId = 6    }
+        new ProductCategory { ProductCategoryId = 1, Name = "guitars" },
+        new ProductCategory { ProductCategoryId = 2, Name = "guitarsamps" },
+        new ProductCategory { ProductCategoryId = 3, Name = "keyboards" },
+        new ProductCategory { ProductCategoryId = 4, Name = "basscabs" },
+        new ProductCategory { ProductCategoryId = 5, Name = "bassamps" },
+        new ProductCategory { ProductCategoryId = 6, Name = "drums" },
+        new ProductCategory { ProductCategoryId = 7, Name = "percussion" },
+        new ProductCategory { ProductCategoryId = 8, Name = "drumhardware" , ParentProductCategoryId = 6 },
+        new ProductCategory { ProductCategoryId = 9, Name = "snaredrum ", ParentProductCategoryId = 6    },
+        new ProductCategory { ProductCategoryId = 10, Name = "kickdrum" , ParentProductCategoryId = 6    },
+        new ProductCategory { ProductCategoryId = 11, Name = "tomdrum"  , ParentProductCategoryId = 6    },
+        new ProductCategory { ProductCategoryId = 12, Name = "cymbals"   , ParentProductCategoryId = 6    }
     );
     }
 }
