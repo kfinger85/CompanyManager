@@ -47,7 +47,8 @@ namespace CompanyManager
             services.AddControllers(); //  Add only the services for the controllers to the DI container, without the view related services
             services.AddDbContext<CompanyManagerContext>(options => options
                 .UseMySql(Configuration.GetConnectionString(connectionStringKey),
-                    new MySqlServerVersion(new Version(8, 0, 26)))
+                    new MySqlServerVersion(new Version(8, 0, 26))),
+                ServiceLifetime.Scoped
             );
             services.AddScoped<IQualificationRepository, QualificationRepository>();
             services.AddScoped<ICompanyRepository, CompanyRepository>();
@@ -73,6 +74,7 @@ namespace CompanyManager
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IProductCategoryService, ProductCategoryService>();
+            services.AddScoped<IOrderService, OrderService>();
 
 
 
