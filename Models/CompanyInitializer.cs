@@ -23,12 +23,14 @@ namespace CompanyManager
 
         private readonly IProductService _productService;
 
+        private readonly IOrderService _orderService;
+
         
 
         public CompanyInitializer(CompanyManagerContext context, CompanyService companyService, 
                                 QualificationService qualificationService,
                                 ProjectService projectService, WorkerService workerService,
-                                IProductService productService
+                                IProductService productService, IOrderService orderService
                                 )
         {
             _context = context;
@@ -37,6 +39,7 @@ namespace CompanyManager
             _projectService = projectService;
             _workerService = workerService;
             _productService = productService;
+            _orderService = orderService;
         }
 
         public void Initialize()
@@ -45,6 +48,7 @@ namespace CompanyManager
           
                     ExecuteInTransaction(CreateOneWorker);
                     ExecuteInTransaction(CreateOneProduct);
+                    ExecuteInTransaction(CreateNewOrder);
                     
                     /*
                     ExecuteInTransaction(CreateCompany);
@@ -72,14 +76,25 @@ namespace CompanyManager
         }
         private void CreateOneProduct()
         {
-            /*
-                    public async Task<Product> CreateProduct(string make, string model, string? serialNumber, ProductCategory productCategory, 
-                                                            string? description, decimal price, int stock, ProductCategories? subCategory, 
-                                                            ICollection<StageProduct>? stageProducts)
-            */
-            _productService.CreateProduct("Fender", "Stratocaster", "123456789", "Guitars" , "A guitar", 1000, 10, null);
-            _productService.CreateProduct("Tama", "Starclassic Kick Drum", "123456789", "Drums" , "A drum kit", 1000, 10, "KickDrums");
+            var faker = new Bogus.Faker();
+            string serialNumber = faker.Random.Replace("###-##-#####");
+
+            _productService.CreateProduct("Fender", "Stratocaster", serialNumber, "Guitars" , "A guitar", 1000, 10, null);
+            serialNumber = faker.Random.Replace("###-###-#####");
+            _productService.CreateProduct("Tama", "Starclassic Kick Drum", serialNumber , "Drums" , "A drum kit", 1000, 10, "KickDrum");
         }
+
+        private void CreateNewOrder()
+        {
+            var faker = new Bogus.Faker();
+            var products = _productService.GetProducts();  // Await the task here
+            // var randomCustomer = customers.OrderBy(q => faker.Random.Int()).First();
+            DateTime startOrderDate = faker.Date.Between(DateTime.Now, DateTime.Now.AddDays(10));
+            DateTime endOrderDate = faker.Date.Between(startOrderDate, startOrderDate.AddDays(10));
+//          public async Task<Order> CreateOrder(string? customerName, DateTime startOrderDate, DateTime endOrderDate,  List<OrderLineItem> orderLineItems)
+            _orderService.CreateOrder( "Bill", startOrderDate, endOrderDate, products);
+        }
+
         private void CreateOneWorker()
         {
             var faker = new Bogus.Faker();
@@ -87,16 +102,16 @@ namespace CompanyManager
             var qualifications = new[] { "Java", "C#", "Python" };
             foreach (var qualificationName in qualifications)
             {
-                _qualificationService.CreateQualification(qualificationName);
+               _qualificationService.CreateQualification(qualificationName);
             }
             var projectQualifications = _qualificationService.GetQualifications();
-            Project project = _projectService.CreateProject("Test Project", projectQualifications, ProjectSize.SMALL, _company);
-            Project project2 = _projectService.CreateProject("Test Project Missing", projectQualifications, ProjectSize.SMALL, _company);
+            Project project =    _projectService.CreateProject("Test Project", projectQualifications, ProjectSize.SMALL, _company);
+            Project project2 =    _projectService.CreateProject("Test Project Missing", projectQualifications, ProjectSize.SMALL, _company);
             string name = "Kevin Finger";
             string username = name.Split(' ')[0].ToLower() + name.Split(' ')[1].ToLower() + faker.Random.Int(1, 1000);
             var qualificationsObjects = _qualificationService.GetQualifications();
             Worker worker = _companyService.CreateWorker(name, qualificationsObjects, 696969.69, username, "password");
-            _companyService.AssignWorkerToProject(worker, project);
+             _companyService.AssignWorkerToProject(worker, project);
         }
 
         private void ExecuteInTransaction(Action method)
@@ -106,11 +121,11 @@ namespace CompanyManager
                 try
                 {
                     method();
-                    transaction.Commit();
+                     transaction.Commit();
                 }
                 catch
                 {
-                    transaction.Rollback();
+                     transaction.Rollback();
                     throw; // Re-throw the exception to propagate it further
                 }
             }
@@ -144,7 +159,7 @@ namespace CompanyManager
 
             foreach (var qualificationName in qualifications)
             {
-                _qualificationService.CreateQualification(qualificationName);
+                 _qualificationService.CreateQualification(qualificationName);
             }
         }
 
