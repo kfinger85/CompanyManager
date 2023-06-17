@@ -4,7 +4,7 @@ namespace MusicProduction.Models
     {
         public int OrderLineItemId { get; set; }
         public int OrderId { get; set; }
-        public int InstrumentId { get; set; }
+        public int ProductId { get; set; }
         public int Quantity { get; set; }
 
         public Order Order { get; set; }
